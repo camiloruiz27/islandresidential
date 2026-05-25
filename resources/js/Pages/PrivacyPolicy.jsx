@@ -1,0 +1,87 @@
+import { Head, Link } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+
+export default function PrivacyPolicy() {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    return (
+        <div className="min-h-screen bg-brand-white text-brand-black font-sans selection:bg-brand-black selection:text-brand-white">
+            <Head title="Privacy Policy - Island Residential" />
+
+            {/* Navbar */}
+            <nav className={`fixed w-full z-50 transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>
+                <div className="max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center">
+                    <Link href="/" className="animate-fade-in">
+                        <img src="/images/media__1779672706531.png" alt="Island Residential" className="h-16 md:h-20 w-auto object-contain" />
+                    </Link>
+                    <Link href="/" className="group flex items-center text-xs font-bold tracking-[0.2em] animate-fade-in opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
+                        <span className="transform transition-transform duration-300 group-hover:-translate-x-2 mr-2">←</span> 
+                        BACK
+                    </Link>
+                </div>
+            </nav>
+
+            <main className="pt-40 pb-32 px-6 md:px-12 max-w-4xl mx-auto">
+                <div className="mb-16 animate-fade-in-up">
+                    <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-8 leading-[1.1] animate-reveal">
+                        Privacy &<br/>
+                        <span className="text-gray-400 font-light">Data Handling.</span>
+                    </h1>
+                    <div className="w-12 h-[3px] bg-brand-black mb-8 rounded-full"></div>
+                    <div className="text-sm font-bold tracking-widest uppercase text-gray-500 mb-2">Last Updated: May 25, 2026</div>
+                    <div className="text-sm font-bold tracking-widest uppercase text-gray-500 mb-2">Data Controller: Island Residential</div>
+                    <div className="text-sm font-bold tracking-widest uppercase text-gray-500">Website: islandresidential.ca</div>
+                </div>
+
+                <div className="prose prose-lg prose-gray max-w-none space-y-8 text-brand-gray font-light leading-relaxed animate-fade-in-up opacity-0" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+                    <p>
+                        At Island Residential, we are committed to protecting the privacy and security of the personal information of our applicants and future tenants. This Privacy Policy explains how we collect, use, disclose, and safeguard your information in compliance with the Personal Information Protection and Electronic Documents Act (PIPEDA) of Canada.
+                    </p>
+
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Information We Collect</h2>
+                    <p>
+                        To properly evaluate rental applications, we collect personal information when you complete our application form. This includes identification and contact details such as your full name, date of birth, cell phone number, email address, current address, and a government-issued photo ID. We also collect occupation details including the number of occupants, presence of smokers or pets, and parking requirements. To assess your suitability as a tenant, we gather your rental history, reasons for moving, employment status, income details including co-applicant income, and supporting documents like employment letters, paystubs, and credit checks. Furthermore, we collect background information regarding vehicles and any criminal offense charges to determine if further background checks are required. Technical data regarding your website visit is also collected through the use of cookies.
+                    </p>
+
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Purpose of Collection</h2>
+                    <p>
+                        Island Residential collects your personal information exclusively to evaluate your financial viability and eligibility as a future tenant of our properties. We also use this data to communicate with you to schedule property viewings, request additional information, or update you on your application status. We use your submitted documents to verify your identity and background for security purposes. We do not use your personal information to send newsletters, marketing emails, or unsolicited advertising.
+                    </p>
+
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Data Sharing & International Transfers</h2>
+                    <p>
+                        Your personal information is securely transmitted directly to the authorized owners and administrators of Island Residential for review. We do not sell or rent your personal information to third parties. Please be advised that our website and databases are hosted on servers located in the United States, and technical maintenance is provided by developers located in Colombia. Consequently, your personal information is transferred, stored, and processed outside of Canada. As a result, your data may be subject to the laws of those foreign jurisdictions, meaning that government or law enforcement authorities in the United States or Colombia could potentially access the information according to their local laws.
+                    </p>
+
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Data Retention</h2>
+                    <p>
+                        We will retain your personal information only for as long as necessary to fulfill the purposes for which it was collected. If your rental application is not approved, your information and all attached documents will be securely kept for a period of three years from the date of submission, after which they will be permanently deleted. If you are approved and become a tenant, your application information will be retained for the entire duration of your lease agreement and for an additional three years after you vacate the property, in order to comply with legal and administrative requirements.
+                    </p>
+
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Security Measures</h2>
+                    <p>
+                        Given the highly sensitive nature of the data collected, including government IDs and financial records, we implement strict physical, organizational, and technological security measures. These safeguards are designed to protect your personal information against loss, theft, unauthorized access, disclosure, copying, or modification.
+                    </p>
+
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Analytics & Cookies</h2>
+                    <p>
+                        Our website utilizes third-party analytics tools to understand how users interact with our platform and to improve the overall user experience. We use Google Analytics to collect anonymous, statistical data about website traffic. Additionally, we use Microsoft Clarity, which helps us understand user behavior on the site through session recordings, capturing mouse movements, clicks, and scrolling activity. You have the right to accept or decline the use of these tracking cookies through the consent notice displayed upon entering our website.
+                    </p>
+
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Your Rights Under PIPEDA</h2>
+                    <p>
+                        Under PIPEDA, you maintain specific rights regarding your privacy. You have the right to request access to the personal information we hold about you, request corrections to any inaccurate or outdated information, withdraw your consent for the use of your data, and request the permanent deletion of your data from our systems. To exercise any of these rights, please send an email to our Privacy Officer at <a href="mailto:info@islandresidential.ca" className="font-bold border-b border-brand-black hover:text-gray-500 transition-colors">info@islandresidential.ca</a> with the subject line "eliminación de mis datos" or specify your request clearly in the body of the email. We will respond to your request within a maximum of 30 days.
+                    </p>
+                </div>
+            </main>
+        </div>
+    );
+}
