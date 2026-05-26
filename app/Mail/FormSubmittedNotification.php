@@ -62,6 +62,38 @@ class FormSubmittedNotification extends Mailable
      */
     public function attachments()
     {
-        return [];
+        $attachments = [];
+
+        // Check for photos in Maintenance Request
+        if (isset($this->formData['photos']) && is_array($this->formData['photos'])) {
+            foreach ($this->formData['photos'] as $photoPath) {
+                $absolutePath = storage_path('app/public/' . $photoPath);
+                if (file_exists($absolutePath)) {
+                    $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromPath($absolutePath);
+                }
+            }
+        }
+
+        // Check for files in Rental Application
+        if (isset($this->formData['files']) && is_array($this->formData['files'])) {
+            foreach ($this->formData['files'] as $fileData) {
+                if (isset($fileData['path'])) {
+                    $disk = $fileData['disk'] ?? 'local';
+                    $absolutePath = $disk === 'public' 
+                        ? storage_path('app/public/' . $fileData['path']) 
+                        : storage_path('app/' . $fileData['path']);
+                        
+                    if (file_exists($absolutePath)) {
+                        $attachment = \Illuminate\Mail\Mailables\Attachment::fromPath($absolutePath);
+                        if (isset($fileData['name'])) {
+                            $attachment->as($fileData['name']);
+                        }
+                        $attachments[] = $attachment;
+                    }
+                }
+            }
+        }
+
+        return $attachments;
     }
 }

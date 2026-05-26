@@ -10,6 +10,17 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        <!-- Google Analytics (mandatory - production only) -->
+        @if(!app()->environment('local'))
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-ELC895716M"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-ELC895716M');
+        </script>
+        @endif
+
         <!-- Scripts -->
         @routes
         @viteReactRefresh

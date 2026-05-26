@@ -11,10 +11,11 @@ class RentalApplication extends Model
 
     protected $fillable = [
         'apartment_id', 'applicant_name', 'applicant_email', 
-        'applicant_phone', 'application_data', 'status'
+        'applicant_phone', 'application_data', 'status', 'files'
     ];
 
     protected $casts = [
         'application_data' => 'array',
+        'files'            => 'array',
     ];
 }

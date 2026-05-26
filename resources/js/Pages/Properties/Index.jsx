@@ -52,9 +52,10 @@ export default function Index({ apartments }) {
                 ) : (
                     <div className="grid md:grid-cols-2 gap-x-12 gap-y-24">
                         {apartments.map((apt, index) => (
-                            <div 
-                                key={apt.id} 
-                                className="group cursor-pointer animate-fade-in-up opacity-0" 
+                            <Link
+                                key={apt.id}
+                                href={route('properties.show', apt.id)}
+                                className="group cursor-pointer animate-fade-in-up opacity-0 block"
                                 style={{ animationDelay: `${0.2 + (index * 0.1)}s`, animationFillMode: 'forwards' }}
                             >
                                 <div className="relative overflow-hidden mb-8 bg-gray-100 aspect-[4/5] animate-reveal rounded-[2.5rem] shadow-sm hover:shadow-xl transition-shadow duration-500">
@@ -91,7 +92,7 @@ export default function Index({ apartments }) {
                                         <span className="w-2 h-2 rounded-full bg-gray-300"></span> {apt.bathrooms} Baths
                                     </span>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 )}

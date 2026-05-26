@@ -3,6 +3,7 @@ import { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function RentalApplication() {
+    const isLocal = typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
     const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
         applicant_name: '',
         applicant_email: '',
@@ -317,16 +318,18 @@ export default function RentalApplication() {
                                         </label>
                                     </div>
 
-                                    <div className="mt-8 flex justify-center">
-                                        <ReCAPTCHA
-                                            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"} // Fallback to Google's test key if env not set
-                                            onChange={(token) => setData('captcha_token', token)}
-                                        />
-                                    </div>
+                                    {!isLocal && (
+                                        <div className="mt-8 flex justify-center">
+                                            <ReCAPTCHA
+                                                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"} // Fallback to Google's test key if env not set
+                                                onChange={(token) => setData('captcha_token', token)}
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className="flex justify-between pt-8 border-t border-gray-100">
                                         <button type="button" onClick={() => setActiveTab(2)} className="px-8 py-4 border border-gray-300 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-50 transition-colors">← Back</button>
-                                        <button type="submit" disabled={processing || !data.application_data.terms_agreed || !data.captcha_token} className="group relative px-10 py-4 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50">
+                                        <button type="submit" disabled={processing || !data.application_data.terms_agreed || (!isLocal && !data.captcha_token)} className="group relative px-10 py-4 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50">
                                             <span className="relative z-10">{processing ? 'Submitting...' : 'Submit Application'}</span>
                                             <div className="absolute inset-0 bg-gray-800 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0 rounded-full"></div>
                                         </button>
