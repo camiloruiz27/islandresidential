@@ -38,12 +38,13 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy to Hostinger via SSH/Rsync
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.SSH_HOST }}
-          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
-          REMOTE_PORT: ${{ secrets.SSH_PORT }}
-          TARGET: ${{ secrets.SSH_TARGET_DIR }} # Ejemplo: public_html/ o dominios/midominio.com/public_html/
-          EXCLUDE: "/.git/, /node_modules/, /tests/, /.env.example, /README.md"
+      - name: Deploy to Hostinger via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ secrets.SSH_TARGET_DIR }}
+            rsync -avzr --delete /path/to/source/
