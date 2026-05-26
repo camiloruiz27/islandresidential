@@ -1,9 +1,11 @@
 import { Link, Head } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Welcome(props) {
     const [scrolled, setScrolled] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [isSectionVisible, setIsSectionVisible] = useState(false);
+    const sectionRef = useRef(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -19,9 +21,26 @@ export default function Welcome(props) {
         window.addEventListener('scroll', handleScroll);
         window.addEventListener('mousemove', handleMouseMove);
         
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsSectionVisible(true);
+                    observer.disconnect(); // Animate only once
+                }
+            },
+            { threshold: 0.2 } // Trigger when 20% of section is visible
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
         return () => {
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('mousemove', handleMouseMove);
+            if (sectionRef.current) {
+                observer.unobserve(sectionRef.current);
+            }
         };
     }, []);
 
@@ -107,24 +126,24 @@ export default function Welcome(props) {
             </header>
 
             {/* Elevated Design Section */}
-            <section className="py-40 px-6 md:px-12 max-w-[1400px] mx-auto bg-brand-white relative">
+            <section ref={sectionRef} className="py-40 px-6 md:px-12 max-w-[1400px] mx-auto bg-brand-white relative">
                 <div className="grid lg:grid-cols-2 gap-20 items-center">
-                    <div className="relative animate-fade-in-up">
-                        <div className="overflow-hidden animate-reveal rounded-[2.5rem] shadow-2xl">
+                    <div className="relative">
+                        <div className={`overflow-hidden rounded-[2.5rem] shadow-2xl ${isSectionVisible ? 'animate-reveal' : 'opacity-0'}`}>
                             <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Minimalist Interior" className="w-full h-[700px] object-cover hover:scale-105 transition-transform duration-1000" />
                         </div>
-                        <div className="absolute -bottom-10 -right-10 bg-brand-black text-brand-white p-12 max-w-sm shadow-2xl rounded-3xl animate-slide-in-right opacity-0" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
+                        <div className={`absolute -bottom-10 -right-10 bg-brand-black text-brand-white p-12 max-w-sm shadow-2xl rounded-3xl opacity-0 ${isSectionVisible ? 'animate-slide-in-right' : ''}`} style={isSectionVisible ? { animationDelay: '0.5s', animationFillMode: 'forwards' } : {}}>
                             <p className="font-bold tracking-widest uppercase text-xs mb-4 text-brand-light">The Standard</p>
                             <h3 className="text-3xl font-light leading-snug">Curated spaces for modern living in Nova Scotia.</h3>
                         </div>
                     </div>
                     <div className="lg:pl-16">
-                        <h2 className="text-5xl md:text-6xl font-bold tracking-tighter mb-8 animate-fade-in-up opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>Elevating Property<br/>Standards.</h2>
-                        <div className="w-12 h-[3px] bg-brand-black mb-8 rounded-full animate-fade-in-up opacity-0" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}></div>
-                        <p className="text-xl text-brand-gray font-light leading-relaxed mb-12 animate-fade-in-up opacity-0" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+                        <h2 className={`text-5xl md:text-6xl font-bold tracking-tighter mb-8 opacity-0 ${isSectionVisible ? 'animate-fade-in-up' : ''}`} style={isSectionVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>Elevating Property<br/>Standards.</h2>
+                        <div className={`w-12 h-[3px] bg-brand-black mb-8 rounded-full opacity-0 ${isSectionVisible ? 'animate-fade-in-up' : ''}`} style={isSectionVisible ? { animationDelay: '0.3s', animationFillMode: 'forwards' } : {}}></div>
+                        <p className={`text-xl text-brand-gray font-light leading-relaxed mb-12 opacity-0 ${isSectionVisible ? 'animate-fade-in-up' : ''}`} style={isSectionVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
                             At Island Residential, we believe in a minimalist, professional, and transparent approach to property management. Experience high-end living near Cape Breton University and beyond.
                         </p>
-                        <Link href={route('properties.index')} className="group inline-flex items-center text-xs font-bold uppercase tracking-[0.2em] px-8 py-4 bg-brand-light rounded-full hover:bg-brand-gray hover:text-brand-white transition-all duration-300 animate-fade-in-up opacity-0 shadow-sm" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
+                        <Link href={route('properties.index')} className={`group inline-flex items-center text-xs font-bold uppercase tracking-[0.2em] px-8 py-4 bg-brand-light rounded-full hover:bg-brand-gray hover:text-brand-white transition-all duration-300 opacity-0 shadow-sm ${isSectionVisible ? 'animate-fade-in-up' : ''}`} style={isSectionVisible ? { animationDelay: '0.5s', animationFillMode: 'forwards' } : {}}>
                             Explore Our Portfolio 
                             <span className="ml-4 transform transition-transform duration-300 group-hover:translate-x-2">→</span>
                         </Link>

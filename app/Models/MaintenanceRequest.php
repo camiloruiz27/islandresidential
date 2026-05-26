@@ -11,6 +11,10 @@ class MaintenanceRequest extends Model
 
     protected $fillable = [
         'tenant_name', 'tenant_email', 'tenant_phone', 
-        'apartment_unit', 'issue_description', 'priority', 'status'
+        'apartment_unit', 'issue_description', 'priority', 'status', 'photos'
+    ];
+
+    protected $casts = [
+        'photos' => 'array',
     ];
 }

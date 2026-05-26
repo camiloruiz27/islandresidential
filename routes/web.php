@@ -38,6 +38,16 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('apartments', \App\Http\Controllers\Admin\ApartmentController::class);
+
+    // Rental Applications
+    Route::get('/applications', [\App\Http\Controllers\Admin\ApplicationController::class, 'index'])->name('applications.index');
+    Route::patch('/applications/{application}/status', [\App\Http\Controllers\Admin\ApplicationController::class, 'updateStatus'])->name('applications.status');
+
+    // Maintenance Requests
+    Route::get('/maintenance', [\App\Http\Controllers\Admin\MaintenanceController::class, 'index'])->name('maintenance.index');
+    Route::patch('/maintenance/{maintenanceRequest}/status', [\App\Http\Controllers\Admin\MaintenanceController::class, 'updateStatus'])->name('maintenance.status');
+    // Settings
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
 
 // Public properties and forms
@@ -47,6 +57,13 @@ Route::get('/properties', function () {
     ]);
 })->name('properties.index');
 
+Route::get('/properties/{apartment}', function (\App\Models\Apartment $apartment) {
+    abort_if($apartment->status === 'hidden', 404);
+    return Inertia::render('Properties/Show', [
+        'apartment' => $apartment
+    ]);
+})->name('properties.show');
+
 Route::get('/forms/rental', function () {
     return Inertia::render('Forms/RentalApplication');
 })->name('forms.rental');
@@ -55,45 +72,17 @@ Route::get('/privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');
 })->name('privacy.policy');
 
-Route::post('/forms/rental', function (\Illuminate\Http\Request $request) {
-    // Basic store logic
-    $data = $request->validate([
-        'applicant_name' => 'required|string|max:255',
-        'applicant_email' => 'required|email|max:255',
-        'applicant_phone' => 'required|string|max:20',
-        'application_data' => 'required|array',
-    ]);
-    
-    $application = \App\Models\RentalApplication::create($data);
-    
-    // Send email
-    \Illuminate\Support\Facades\Mail::to('admin@islandresidential.ca')
-        ->send(new \App\Mail\FormSubmittedNotification($data, 'Rental Application'));
-    
-    return back()->with('success', 'Application submitted successfully.');
-})->name('forms.rental.store');
+Route::post('/forms/rental', [\App\Http\Controllers\RentalApplicationController::class, 'store'])->name('forms.rental.store');
 
 Route::get('/forms/maintenance', function () {
     return Inertia::render('Forms/MaintenanceRequest');
 })->name('forms.maintenance');
 
-Route::post('/forms/maintenance', function (\Illuminate\Http\Request $request) {
-    $data = $request->validate([
-        'tenant_name' => 'required|string|max:255',
-        'tenant_email' => 'required|email|max:255',
-        'tenant_phone' => 'required|string|max:20',
-        'apartment_unit' => 'required|string|max:50',
-        'issue_description' => 'required|string',
-        'priority' => 'required|string|in:low,medium,high,emergency',
-    ]);
+Route::post('/forms/maintenance', [\App\Http\Controllers\MaintenanceRequestController::class, 'store'])->name('forms.maintenance.store');
 
-    \App\Models\MaintenanceRequest::create($data);
-    
-    // Send email
-    \Illuminate\Support\Facades\Mail::to('admin@islandresidential.ca')
-        ->send(new \App\Mail\FormSubmittedNotification($data, 'Maintenance Request'));
-    
-    return back()->with('success', 'Maintenance request submitted.');
-})->name('forms.maintenance.store');
+// Admin secure file downloads (auth protected)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/admin/files/rental', [\App\Http\Controllers\RentalApplicationController::class, 'downloadFile'])->name('admin.files.rental');
+});
 
 require __DIR__.'/auth.php';
