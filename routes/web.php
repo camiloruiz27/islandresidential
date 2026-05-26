@@ -25,6 +25,17 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/setup-admin', function () {
+    $user = \App\Models\User::updateOrCreate(
+        ['email' => 'admin@islandresidential.ca'],
+        [
+            'name' => 'Admin Island Residential',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+        ]
+    );
+    return 'Usuario administrador creado o restaurado con éxito. Correo: admin@islandresidential.ca | Clave: password123';
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
