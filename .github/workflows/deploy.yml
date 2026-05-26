@@ -47,4 +47,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ${{ secrets.SSH_TARGET_DIR }}
-            rsync -avzr --delete /path/to/source/
+            rsync -avzr --delete ./
