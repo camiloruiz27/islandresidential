@@ -73,27 +73,34 @@ class ApartmentController extends Controller
             'bedrooms' => 'required|integer|min:0',
             'bathrooms' => 'required|integer|min:0',
             'status' => 'required|in:available,rented,hidden',
+            'images_to_keep' => 'nullable|array',
+            'images_to_keep.*' => 'string',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
         ]);
 
-        // Only replace images if new ones were uploaded
+        $currentImages = $apartment->images ?: [];
+        $imagesToKeep = $request->input('images_to_keep', []);
+
+        // Find images that were removed by the admin and delete them from storage
+        $imagesToDelete = array_diff($currentImages, $imagesToKeep);
+        foreach ($imagesToDelete as $oldUrl) {
+            $path = str_replace('/storage/', '', $oldUrl);
+            Storage::disk('public')->delete($path);
+        }
+
+        // Start with the images we are keeping
+        $finalImages = $imagesToKeep;
+
+        // Add any newly uploaded images
         if ($request->hasFile('images')) {
-            // Delete old images from storage
-            if ($apartment->images) {
-                foreach ($apartment->images as $oldUrl) {
-                    $path = str_replace('/storage/', '', $oldUrl);
-                    Storage::disk('public')->delete($path);
-                }
-            }
-            $imageUrls = [];
             foreach ($request->file('images') as $image) {
                 $path = $image->store('apartments', 'public');
-                $imageUrls[] = Storage::url($path);
+                $finalImages[] = Storage::url($path);
             }
-            $validated['images'] = $imageUrls;
-        } else {
-            unset($validated['images']);
         }
+
+        $validated['images'] = $finalImages;
+        unset($validated['images_to_keep']);
 
         $apartment->update($validated);
 

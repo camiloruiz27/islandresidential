@@ -22,17 +22,32 @@ export default function Edit({ apartment }) {
         bedrooms: apartment.bedrooms,
         bathrooms: apartment.bathrooms,
         status: apartment.status,
+        images_to_keep: apartment.images || [],
         images: [],
     });
 
     const [newImagePreviews, setNewImagePreviews] = useState([]);
-    const existingImages = apartment.images || [];
 
     const handleImages = (e) => {
         const files = Array.from(e.target.files);
-        setData('images', files);
-        const previews = files.map(file => URL.createObjectURL(file));
+        // Combine with existing newly uploaded files if user clicks upload multiple times
+        const allNewFiles = [...data.images, ...files];
+        setData('images', allNewFiles);
+        
+        const previews = allNewFiles.map(file => URL.createObjectURL(file));
         setNewImagePreviews(previews);
+        // Reset input so the same files can be selected again if needed
+        e.target.value = '';
+    };
+
+    const removeExistingImage = (indexToRemove) => {
+        setData('images_to_keep', data.images_to_keep.filter((_, idx) => idx !== indexToRemove));
+    };
+
+    const removeNewImage = (indexToRemove) => {
+        const updatedFiles = data.images.filter((_, idx) => idx !== indexToRemove);
+        setData('images', updatedFiles);
+        setNewImagePreviews(updatedFiles.map(file => URL.createObjectURL(file)));
     };
 
     const submit = (e) => {
@@ -76,13 +91,20 @@ export default function Edit({ apartment }) {
                         <div className="bg-white rounded-2xl border border-gray-100 p-6">
                             <h3 className="font-bold text-sm uppercase tracking-widest text-gray-400 pb-3 border-b border-gray-50 mb-5">Photos</h3>
 
-                            {existingImages.length > 0 && (
+                            {data.images_to_keep.length > 0 && (
                                 <div className="mb-5">
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Current Photos</p>
                                     <div className="grid grid-cols-3 gap-3">
-                                        {existingImages.map((src, i) => (
-                                            <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100">
+                                        {data.images_to_keep.map((src, i) => (
+                                            <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group">
                                                 <img src={src} alt="" className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeExistingImage(i)}
+                                                    className="absolute top-2 right-2 w-7 h-7 bg-white/90 text-red-500 rounded-full flex items-center justify-center font-bold text-xs shadow-sm hover:bg-red-500 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                                                >
+                                                    ✕
+                                                </button>
                                                 {i === 0 && (
                                                     <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs py-1 text-center font-bold">Cover</div>
                                                 )}
@@ -94,18 +116,29 @@ export default function Edit({ apartment }) {
 
                             <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-black transition-colors cursor-pointer" onClick={() => document.getElementById('photo-input').click()}>
                                 <div className="text-2xl mb-2">📸</div>
-                                <p className="text-sm font-semibold text-gray-600 mb-1">Upload new photos to replace current ones</p>
+                                <p className="text-sm font-semibold text-gray-600 mb-1">Upload new photos to add to this apartment</p>
                                 <p className="text-xs text-gray-400">JPG, PNG up to 10MB each</p>
                                 <input id="photo-input" type="file" multiple accept="image/*" className="hidden" onChange={handleImages} />
                             </div>
+                            
                             {newImagePreviews.length > 0 && (
-                                <div className="grid grid-cols-3 gap-3 mt-4">
-                                    {newImagePreviews.map((src, i) => (
-                                        <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 ring-2 ring-black">
-                                            <img src={src} alt="" className="w-full h-full object-cover" />
-                                            {i === 0 && <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs py-1 text-center font-bold">New Cover</div>}
-                                        </div>
-                                    ))}
+                                <div className="mt-5">
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Newly Added Photos</p>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        {newImagePreviews.map((src, i) => (
+                                            <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 ring-2 ring-black group">
+                                                <img src={src} alt="" className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeNewImage(i)}
+                                                    className="absolute top-2 right-2 w-7 h-7 bg-white/90 text-red-500 rounded-full flex items-center justify-center font-bold text-xs shadow-sm hover:bg-red-500 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                                                >
+                                                    ✕
+                                                </button>
+                                                {(i === 0 && data.images_to_keep.length === 0) && <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs py-1 text-center font-bold">New Cover</div>}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
