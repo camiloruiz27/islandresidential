@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
                         <img src="/images/media__1779672706531.png" alt="Island Residential" className="h-16 md:h-20 w-auto object-contain" />
                     </Link>
                     <Link href="/" className="group flex items-center text-xs font-bold tracking-[0.2em] animate-fade-in opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-                        <span className="transform transition-transform duration-300 group-hover:-translate-x-2 mr-2">←</span> 
+                        <span className="transform transition-transform duration-300 group-hover:-translate-x-2 mr-2">←</span>
                         BACK
                     </Link>
                 </div>
@@ -32,7 +32,7 @@ export default function PrivacyPolicy() {
             <main className="pt-40 pb-32 px-6 md:px-12 max-w-4xl mx-auto">
                 <div className="mb-16 animate-fade-in-up">
                     <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-8 leading-[1.1] animate-reveal">
-                        Privacy &<br/>
+                        Privacy &<br />
                         <span className="text-gray-400 font-light">Data Handling.</span>
                     </h1>
                     <div className="w-12 h-[3px] bg-brand-black mb-8 rounded-full"></div>
@@ -48,12 +48,15 @@ export default function PrivacyPolicy() {
 
                     <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Information We Collect</h2>
                     <p>
-                        To properly evaluate rental applications, we collect personal information when you complete our application form. This includes identification and contact details such as your full name, date of birth, cell phone number, email address, current address, and a government-issued photo ID. We also collect occupation details including the number of occupants, presence of smokers or pets, and parking requirements. To assess your suitability as a tenant, we gather your rental history, reasons for moving, employment status, income details including co-applicant income, and supporting documents like employment letters, paystubs, and credit checks. Furthermore, we collect background information regarding vehicles and any criminal offense charges to determine if further background checks are required. Technical data regarding your website visit is also collected through the use of cookies.
+                        To properly evaluate rental applications, we collect personal information when you complete our application form. This includes identification and contact details such as your full name, date of birth, cell phone number, email address, current address, and a government-issued photo ID. We also collect occupation details including the number of occupants, presence of smokers or pets, and parking requirements. To assess your suitability as a tenant, we gather your rental history, reasons for moving, employment status, income details including co-applicant income, and supporting documents like employment letters, paystubs, and credit checks. Furthermore, we collect background information regarding vehicles and any criminal offense charges to determine if further background checks are required.
+                    </p>
+                    <p className="mt-4">
+                        <strong>Partial Form Submissions:</strong> Please note that our application form saves partial data as a "draft" as you progress through the steps. This means we may collect and store the contact information you provide in the first section even if you do not complete the final submission, enabling us to assist you with your application process. Technical data regarding your website visit is also collected through the use of cookies.
                     </p>
 
                     <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Purpose of Collection</h2>
                     <p>
-                        Island Residential collects your personal information exclusively to evaluate your financial viability and eligibility as a future tenant of our properties. We also use this data to communicate with you to schedule property viewings, request additional information, or update you on your application status. We use your submitted documents to verify your identity and background for security purposes. We do not use your personal information to send newsletters, marketing emails, or unsolicited advertising.
+                        Island Residential collects your personal information exclusively to evaluate your financial viability and eligibility as a future tenant of our properties, financial viability or collection purposes should they be deemed necessary We also use this data to communicate with you to schedule property viewings, request additional information, or update you on your application status. We use your submitted documents to verify your identity and background for security purposes. We do not use your personal information to send newsletters, marketing emails, or unsolicited advertising.
                     </p>
 
                     <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Data Sharing & International Transfers</h2>
@@ -71,6 +74,16 @@ export default function PrivacyPolicy() {
                         Given the highly sensitive nature of the data collected, including government IDs and financial records, we implement strict physical, organizational, and technological security measures. These safeguards are designed to protect your personal information against loss, theft, unauthorized access, disclosure, copying, or modification.
                     </p>
 
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Applicant Declarations & Consent</h2>
+                    <p>
+                        By submitting a rental application, you explicitly agree to the following declarations:
+                        <ul className="list-disc pl-6 mt-4 space-y-2">
+                            <li>I, the undersigned, grant permission to contact the personal references listed above, both now and in the future for rental consideration or for collection purposes should they be deemed necessary.</li>
+                            <li>I, the undersigned, grant permission to obtain and/or exchange personal or financial information from/with any personal information agency towards verifying or establishing my financial standing.</li>
+                            <li>I, the undersigned, acknowledge and understand that personal information will be collected, processed, and stored for the purposes of now and future rental applications or for collections purposes should they be deemed necessary.</li>
+                        </ul>
+                    </p>
+
                     <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Analytics & Cookies</h2>
                     <p>
                         Our website utilizes third-party analytics tools to understand how users interact with our platform and to improve the overall user experience. We use Google Analytics to collect anonymous, statistical data about website traffic. Additionally, we use Microsoft Clarity, which helps us understand user behavior on the site through session recordings, capturing mouse movements, clicks, and scrolling activity. You have the right to accept or decline the use of these tracking cookies through the consent notice displayed upon entering our website.
@@ -78,7 +91,7 @@ export default function PrivacyPolicy() {
 
                     <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Your Rights Under PIPEDA</h2>
                     <p>
-                        Under PIPEDA, you maintain specific rights regarding your privacy. You have the right to request access to the personal information we hold about you, request corrections to any inaccurate or outdated information, withdraw your consent for the use of your data, and request the permanent deletion of your data from our systems. To exercise any of these rights, please send an email to our Privacy Officer at <a href="mailto:info@islandresidential.ca" className="font-bold border-b border-brand-black hover:text-gray-500 transition-colors">info@islandresidential.ca</a> with the subject line "eliminación de mis datos" or specify your request clearly in the body of the email. We will respond to your request within a maximum of 30 days.
+                        Under PIPEDA, you maintain specific rights regarding your privacy. You have the right to request access to the personal information we hold about you, request corrections to any inaccurate or outdated information, withdraw your consent for the use of your data, and request the permanent deletion of your data from our systems. To exercise any of these rights, please send an email to our Privacy Officer at <a href="mailto:rent@islandresidential.ca" className="font-bold border-b border-brand-black hover:text-gray-500 transition-colors">rent@islandresidential.ca</a> with the subject line "delete my data" or specify your request clearly in the body of the email. We will respond to your request within a maximum of 30 days.
                     </p>
                 </div>
             </main>

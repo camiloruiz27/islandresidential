@@ -49,8 +49,8 @@ export default function MaintenanceRequest() {
 
                 {recentlySuccessful ? (
                     <div className="bg-green-50 border border-green-200 text-green-800 p-10 shadow-sm rounded-3xl animate-scale-up">
-                        <h3 className="font-bold text-2xl mb-4 tracking-tight">Request Submitted!</h3>
-                        <p className="font-light text-lg mb-8">We have received your maintenance request and will contact you soon.</p>
+                        <h3 className="font-bold text-2xl mb-4 tracking-tight">Thank you for your submission!</h3>
+                        <p className="font-light text-lg mb-8">We have received your maintenance request and our team will be in touch within 3 business days.</p>
                         <button onClick={() => window.location.reload()} className="text-sm font-bold tracking-[0.2em] uppercase border-b-2 border-green-800 pb-1 hover:text-green-600 hover:border-green-600 transition-colors">Submit another</button>
                     </div>
                 ) : (
