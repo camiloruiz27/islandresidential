@@ -166,12 +166,12 @@ export default function Show({ apartment }) {
                                     >
                                         Apply Now
                                     </Link>
-                                    <Link
-                                        href={route('forms.maintenance')}
+                                    <a
+                                        href={`mailto:rent@islandresidential.ca?subject=Viewing Request: ${apartment.title}`}
                                         className="block w-full text-center border border-white/20 text-white/70 py-4 rounded-xl font-bold text-sm tracking-[0.15em] uppercase hover:border-white hover:text-white transition-colors"
                                     >
-                                        Maintenance Request
-                                    </Link>
+                                        Book a Viewing
+                                    </a>
                                 </div>
                             </div>
                         </div>

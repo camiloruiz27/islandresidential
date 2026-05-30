@@ -76,8 +76,14 @@ Route::get('/properties/{apartment}', function (\App\Models\Apartment $apartment
 })->name('properties.show');
 
 Route::get('/forms/rental', function () {
-    return Inertia::render('Forms/RentalApplication');
+    return Inertia::render('Forms/RentalApplication', [
+        'apartments' => \App\Models\Apartment::where('status', 'available')->get()
+    ]);
 })->name('forms.rental');
+
+Route::post('/forms/rental/draft', [\App\Http\Controllers\RentalApplicationController::class, 'storeDraft'])->name('forms.rental.draft');
+
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');

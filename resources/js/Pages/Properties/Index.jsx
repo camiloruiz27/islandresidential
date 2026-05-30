@@ -23,7 +23,7 @@ export default function Index({ apartments }) {
                         <img src="/images/media__1779672706531.png" alt="Island Residential" className="h-16 md:h-20 w-auto object-contain" />
                     </Link>
                     <Link href="/" className="group flex items-center text-xs font-bold tracking-[0.2em] animate-fade-in opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-                        <span className="transform transition-transform duration-300 group-hover:-translate-x-2 mr-2">←</span> 
+                        <span className="transform transition-transform duration-300 group-hover:-translate-x-2 mr-2">←</span>
                         BACK
                     </Link>
                 </div>
@@ -32,12 +32,12 @@ export default function Index({ apartments }) {
             <main className="pt-40 pb-32 px-6 md:px-12 max-w-[1400px] mx-auto">
                 <div className="mb-24 animate-fade-in-up">
                     <h1 className="text-6xl md:text-8xl font-bold tracking-tighter mb-8 leading-[1.1] animate-reveal">
-                        Curated<br/>
-                        <span className="text-gray-400 font-light">Residences.</span>
+                        Available <br />
+                        <span className="text-gray-400 font-light">Apartments.</span>
                     </h1>
                     <div className="w-12 h-[3px] bg-brand-black mb-8 rounded-full"></div>
                     <p className="text-xl text-brand-gray font-light max-w-xl leading-relaxed">
-                        Explore our premium selection of available properties designed for exceptional living in Nova Scotia.
+                        Browse apartments for rent in Sydney, Nova Scotia and across Cape Breton. Island Residential offers professionally.
                     </p>
                 </div>
 
@@ -60,9 +60,9 @@ export default function Index({ apartments }) {
                             >
                                 <div className="relative overflow-hidden mb-8 bg-gray-100 aspect-[4/5] animate-reveal rounded-[2.5rem] shadow-sm hover:shadow-xl transition-shadow duration-500">
                                     {apt.images && apt.images.length > 0 ? (
-                                        <img 
-                                            src={apt.images[0]} 
-                                            alt={apt.title} 
+                                        <img
+                                            src={apt.images[0]}
+                                            alt={apt.title}
                                             className="w-full h-full object-cover transform transition-transform duration-[1.5s] ease-out group-hover:scale-110"
                                         />
                                     ) : (

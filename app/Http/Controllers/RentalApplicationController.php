@@ -21,6 +21,7 @@ class RentalApplicationController extends Controller
             'application_data' => 'required|array',
             'photo_id' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'relevant_files.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'pet_photo' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
         ];
 
         if (!app()->environment('local')) {
@@ -53,6 +54,13 @@ class RentalApplicationController extends Controller
             $allFiles[] = ['type' => 'Photo ID', 'path' => $path, 'disk' => 'local', 'name' => $request->file('photo_id')->getClientOriginalName()];
         }
 
+        // Store Pet Photo if provided
+        if ($request->hasFile('pet_photo')) {
+            $path = $request->file('pet_photo')->store('rental_applications/pets', 'local');
+            $appData['pet_photo_path'] = $path;
+            $allFiles[] = ['type' => 'Pet Photo', 'path' => $path, 'disk' => 'local', 'name' => $request->file('pet_photo')->getClientOriginalName()];
+        }
+
         // Store relevant files in private storage (sensitive documents)
         if ($request->hasFile('relevant_files')) {
             foreach ($request->file('relevant_files') as $file) {
@@ -76,6 +84,36 @@ class RentalApplicationController extends Controller
         Mail::to($rentalEmail)->send(new FormSubmittedNotification($application->toArray(), 'Rental Application'));
 
         return back()->with('success', 'Application submitted successfully.');
+    }
+
+    public function storeDraft(Request $request)
+    {
+        $rules = [
+            'applicant_name' => 'required|string|max:255',
+            'applicant_email' => 'required|email|max:255',
+            'applicant_phone' => 'required|string|max:20',
+            'application_data' => 'required|array',
+        ];
+
+        $request->validate($rules);
+
+        $appData = $request->application_data;
+
+        // Create Draft Application
+        $application = RentalApplication::create([
+            'applicant_name'  => $request->applicant_name,
+            'applicant_email' => $request->applicant_email,
+            'applicant_phone' => $request->applicant_phone,
+            'application_data' => $appData,
+            'files'           => [],
+            'status'          => 'draft'
+        ]);
+
+        // Send Email for the draft
+        $rentalEmail = Setting::get('rental_email', 'info@islandresidential.ca');
+        Mail::to($rentalEmail)->send(new FormSubmittedNotification($application->toArray(), 'Rental Application (Partial/Draft)'));
+
+        return response()->json(['success' => true]);
     }
 
     /**
