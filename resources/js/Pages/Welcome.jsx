@@ -16,8 +16,8 @@ export default function Welcome(props) {
             onSuccess: () => reset(),
         });
     };
-
     const [scrolled, setScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [isSectionVisible, setIsSectionVisible] = useState(false);
     const [isOffersVisible, setIsOffersVisible] = useState(false);
@@ -96,7 +96,7 @@ export default function Welcome(props) {
             <Head title="Welcome to Island Residential" />
 
             {/* Navbar */}
-            <nav className={`fixed w-full z-50 transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>
+            <nav className={`fixed w-full z-[60] transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>
                 <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
                     <Link href="/" className="animate-fade-in">
                         <img src="/images/media__1779672706531.png" alt="Island Residential" className="h-16 md:h-20 w-auto object-contain" />
@@ -115,8 +115,29 @@ export default function Welcome(props) {
                             <span className="absolute bottom-0 left-0 w-full h-[2px] bg-brand-black transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-full"></span>
                         </Link>
                     </div>
+
+                    {/* Mobile Menu Button */}
+                    <button 
+                        className="md:hidden flex flex-col justify-center items-center w-10 h-10 space-y-1.5 z-[60] relative"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Toggle Menu"
+                    >
+                        <span className={`block w-6 h-[2px] bg-brand-black transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-[8px] bg-brand-black' : 'bg-brand-black'}`}></span>
+                        <span className={`block w-6 h-[2px] bg-brand-black transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
+                        <span className={`block w-6 h-[2px] bg-brand-black transition-transform duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-[8px] bg-brand-black' : 'bg-brand-black'}`}></span>
+                    </button>
                 </div>
             </nav>
+
+            {/* Mobile Menu Overlay */}
+            <div className={`fixed inset-0 z-[55] bg-brand-white/95 backdrop-blur-xl transition-all duration-500 flex flex-col justify-center items-center md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+                <div className="flex flex-col space-y-10 text-center text-lg font-bold tracking-[0.2em] uppercase">
+                    <Link href={route('properties.index')} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-gray-500 transition-colors">APARTMENTS</Link>
+                    <Link href={route('forms.rental')} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-gray-500 transition-colors">APPLY</Link>
+                    <Link href={route('forms.maintenance')} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-gray-500 transition-colors">MAINTENANCE</Link>
+                    <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-gray-500 transition-colors">CONTACT US</a>
+                </div>
+            </div>
 
             {/* Hero Section */}
             <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-brand-black text-brand-white">
@@ -132,7 +153,7 @@ export default function Welcome(props) {
                 </div>
                 <div className="relative z-10 text-center px-6 max-w-5xl mx-auto mt-20">
                     <div className="overflow-hidden mb-6">
-                        <h1 className="text-5xl md:text-8xl font-bold tracking-tighter leading-[1.1] animate-fade-in-up opacity-0" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
+                        <h1 className="text-4xl sm:text-5xl md:text-8xl font-bold tracking-tighter leading-[1.1] animate-fade-in-up opacity-0" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
                             Apartments for Rent in Sydney, NS & Cape Breton
                         </h1>
                     </div>
