@@ -21,6 +21,7 @@ export default function Create() {
         bedrooms: 1,
         bathrooms: 1,
         status: 'available',
+        has_parking: false,
         images: [],
     });
 
@@ -180,6 +181,16 @@ export default function Create() {
                                     <option value="hidden">Hidden</option>
                                 </select>
                             </InputField>
+
+                            <label className="flex items-center gap-3 cursor-pointer mt-4">
+                                <input
+                                    type="checkbox"
+                                    className="w-5 h-5 rounded border-gray-300 text-black focus:ring-black"
+                                    checked={data.has_parking}
+                                    onChange={e => setData('has_parking', e.target.checked)}
+                                />
+                                <span className="text-sm font-bold text-gray-700">Has Parking</span>
+                            </label>
                         </div>
 
                         <button

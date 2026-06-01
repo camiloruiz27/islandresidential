@@ -22,6 +22,7 @@ export default function Edit({ apartment }) {
         bedrooms: apartment.bedrooms,
         bathrooms: apartment.bathrooms,
         status: apartment.status,
+        has_parking: Boolean(apartment.has_parking),
         images_to_keep: apartment.images || [],
         images: [],
     });
@@ -171,6 +172,16 @@ export default function Edit({ apartment }) {
                                     <option value="hidden">Hidden</option>
                                 </select>
                             </InputField>
+
+                            <label className="flex items-center gap-3 cursor-pointer mt-4">
+                                <input
+                                    type="checkbox"
+                                    className="w-5 h-5 rounded border-gray-300 text-black focus:ring-black"
+                                    checked={data.has_parking}
+                                    onChange={e => setData('has_parking', e.target.checked)}
+                                />
+                                <span className="text-sm font-bold text-gray-700">Has Parking</span>
+                            </label>
                         </div>
 
                         <button type="submit" disabled={processing} className="w-full bg-black text-white py-4 rounded-xl font-bold text-sm hover:bg-gray-800 transition-colors disabled:opacity-50">

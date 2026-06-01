@@ -11,10 +11,11 @@ class Apartment extends Model
 
     protected $fillable = [
         'title', 'description', 'location', 'price', 
-        'bedrooms', 'bathrooms', 'images', 'status'
+        'bedrooms', 'bathrooms', 'images', 'status', 'has_parking'
     ];
 
     protected $casts = [
         'images' => 'array',
+        'has_parking' => 'boolean',
     ];
 }

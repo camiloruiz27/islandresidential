@@ -33,6 +33,7 @@ class ApartmentController extends Controller
             'bedrooms' => 'required|integer|min:0',
             'bathrooms' => 'required|integer|min:0',
             'status' => 'required|in:available,rented,hidden',
+            'has_parking' => 'boolean',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
         ]);
 
@@ -73,6 +74,7 @@ class ApartmentController extends Controller
             'bedrooms' => 'required|integer|min:0',
             'bathrooms' => 'required|integer|min:0',
             'status' => 'required|in:available,rented,hidden',
+            'has_parking' => 'boolean',
             'images_to_keep' => 'nullable|array',
             'images_to_keep.*' => 'string',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',

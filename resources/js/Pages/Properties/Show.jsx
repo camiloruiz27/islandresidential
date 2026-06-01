@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 export default function Show({ apartment }) {
     const [scrolled, setScrolled] = useState(false);
     const [activeImage, setActiveImage] = useState(0);
+    const [showBookingModal, setShowBookingModal] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -136,7 +137,7 @@ export default function Show({ apartment }) {
                             <div className="sticky top-32">
                                 <div className="bg-brand-black text-brand-white rounded-[2rem] p-8 shadow-2xl">
                                     <div className="text-xs font-bold uppercase tracking-[0.25em] text-white/40 mb-2">Monthly Rent</div>
-                                    <div className="text-5xl font-bold tracking-tighter mb-1">
+                                    <div className="text-4xl font-bold tracking-tighter mb-1">
                                         ${Number(apartment.price).toLocaleString()}
                                     </div>
                                     <div className="text-white/40 text-sm mb-10">per month</div>
@@ -158,6 +159,14 @@ export default function Show({ apartment }) {
                                             <span className="text-white/50">Status</span>
                                             <span className="font-bold capitalize">{apartment.status}</span>
                                         </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-white/50">Parking</span>
+                                            <span className="font-bold">{apartment.has_parking ? 'Yes' : 'No'}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-white/50">Pet friendly</span>
+                                            <span className="font-bold">Based on approval</span>
+                                        </div>
                                     </div>
 
                                     <Link
@@ -166,12 +175,12 @@ export default function Show({ apartment }) {
                                     >
                                         Apply Now
                                     </Link>
-                                    <a
-                                        href={`mailto:rent@islandresidential.ca?subject=Viewing Request: ${apartment.title}`}
+                                    <button
+                                        onClick={() => setShowBookingModal(true)}
                                         className="block w-full text-center border border-white/20 text-white/70 py-4 rounded-xl font-bold text-sm tracking-[0.15em] uppercase hover:border-white hover:text-white transition-colors"
                                     >
                                         Book a Viewing
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -191,6 +200,65 @@ export default function Show({ apartment }) {
                     <span className="absolute inset-0 z-10 flex items-center justify-center transform translate-y-10 group-hover:translate-y-0 transition-transform duration-500">Get Started &rarr;</span>
                 </Link>
             </section>
+
+            {/* Booking Modal */}
+            {showBookingModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in">
+                    {/* Backdrop */}
+                    <div 
+                        className="absolute inset-0 bg-brand-black/70 backdrop-blur-md"
+                        onClick={() => setShowBookingModal(false)}
+                    ></div>
+                    
+                    {/* Modal Content */}
+                    <div className="relative bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl animate-fade-in-up">
+                        <button 
+                            onClick={() => setShowBookingModal(false)}
+                            className="absolute top-6 right-6 w-10 h-10 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center font-bold hover:bg-gray-200 hover:text-black transition-colors"
+                        >
+                            ✕
+                        </button>
+                        
+                        <div className="text-center mb-10 mt-2">
+                            <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400 mb-4">Book a Viewing</h3>
+                            <h4 className="text-3xl font-light tracking-tight">{apartment.title}</h4>
+                            <div className="w-8 h-1 bg-brand-black mx-auto mt-6 rounded-full"></div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <a 
+                                href={`sms:+19029791163?&body=${encodeURIComponent("Hello, I am interested in booking a viewing for: " + apartment.title + ". Could you let me know your availability?")}`}
+                                className="group flex items-center justify-between w-full p-6 bg-[#007AFF] text-white rounded-3xl hover:bg-[#0066CC] transition-colors shadow-lg shadow-blue-500/20"
+                            >
+                                <div className="text-left">
+                                    <div className="font-bold text-lg mb-1">Send Text Message</div>
+                                    <div className="text-blue-100 text-sm font-light">Fastest response via iMessage/SMS</div>
+                                </div>
+                                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    💬
+                                </div>
+                            </a>
+
+                            <a 
+                                href={`mailto:rent@islandresidential.ca?subject=Viewing Request: ${apartment.title}`}
+                                className="group flex items-center justify-between w-full p-6 bg-gray-50 border border-gray-200 text-brand-black rounded-3xl hover:border-black hover:bg-gray-100 transition-colors"
+                            >
+                                <div className="text-left">
+                                    <div className="font-bold text-lg mb-1">Send an Email</div>
+                                    <div className="text-gray-500 text-sm font-light">rent@islandresidential.ca</div>
+                                </div>
+                                <div className="w-12 h-12 bg-white border border-gray-200 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    ✉️
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <p className="text-center text-xs text-gray-400 mt-8 font-light">
+                            Our team typically responds within a few hours.
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
