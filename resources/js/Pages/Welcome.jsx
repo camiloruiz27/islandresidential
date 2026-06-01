@@ -16,8 +16,8 @@ export default function Welcome(props) {
             onSuccess: () => reset(),
         });
     };
-
     const [scrolled, setScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [isSectionVisible, setIsSectionVisible] = useState(false);
     const [isOffersVisible, setIsOffersVisible] = useState(false);
@@ -96,7 +96,7 @@ export default function Welcome(props) {
             <Head title="Welcome to Island Residential" />
 
             {/* Navbar */}
-            <nav className={`fixed w-full z-50 transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>
+            <nav className={`fixed w-full z-[60] transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>
                 <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
                     <Link href="/" className="animate-fade-in">
                         <img src="/images/media__1779672706531.png" alt="Island Residential" className="h-16 md:h-20 w-auto object-contain" />
@@ -115,8 +115,29 @@ export default function Welcome(props) {
                             <span className="absolute bottom-0 left-0 w-full h-[2px] bg-brand-black transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-full"></span>
                         </Link>
                     </div>
+
+                    {/* Mobile Menu Button */}
+                    <button 
+                        className="md:hidden flex flex-col justify-center items-center w-10 h-10 space-y-1.5 z-[60] relative"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Toggle Menu"
+                    >
+                        <span className={`block w-6 h-[2px] bg-brand-black transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-[8px] bg-brand-black' : 'bg-brand-black'}`}></span>
+                        <span className={`block w-6 h-[2px] bg-brand-black transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
+                        <span className={`block w-6 h-[2px] bg-brand-black transition-transform duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-[8px] bg-brand-black' : 'bg-brand-black'}`}></span>
+                    </button>
                 </div>
             </nav>
+
+            {/* Mobile Menu Overlay */}
+            <div className={`fixed inset-0 z-[55] bg-brand-white/95 backdrop-blur-xl transition-all duration-500 flex flex-col justify-center items-center md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+                <div className="flex flex-col space-y-10 text-center text-lg font-bold tracking-[0.2em] uppercase">
+                    <Link href={route('properties.index')} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-gray-500 transition-colors">APARTMENTS</Link>
+                    <Link href={route('forms.rental')} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-gray-500 transition-colors">APPLY</Link>
+                    <Link href={route('forms.maintenance')} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-gray-500 transition-colors">MAINTENANCE</Link>
+                    <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-gray-500 transition-colors">CONTACT US</a>
+                </div>
+            </div>
 
             {/* Hero Section */}
             <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-brand-black text-brand-white">
@@ -132,7 +153,7 @@ export default function Welcome(props) {
                 </div>
                 <div className="relative z-10 text-center px-6 max-w-5xl mx-auto mt-20">
                     <div className="overflow-hidden mb-6">
-                        <h1 className="text-5xl md:text-8xl font-bold tracking-tighter leading-[1.1] animate-fade-in-up opacity-0" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
+                        <h1 className="text-4xl sm:text-5xl md:text-8xl font-bold tracking-tighter leading-[1.1] animate-fade-in-up opacity-0" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
                             Apartments for Rent in Sydney, NS & Cape Breton
                         </h1>
                     </div>
@@ -176,7 +197,14 @@ export default function Welcome(props) {
                         </div>
                         <div className={`absolute -bottom-10 -right-10 bg-brand-black text-brand-white p-12 max-w-sm shadow-2xl rounded-3xl opacity-0 ${isSectionVisible ? 'animate-slide-in-right' : ''}`} style={isSectionVisible ? { animationDelay: '0.5s', animationFillMode: 'forwards' } : {}}>
                             <p className="font-bold tracking-widest uppercase text-xs mb-4 text-brand-light">Apartments in </p>
-                            <h4 className="text-3xl font-light leading-snug">Sydney, New Waterford, North Sydney, Sydney Mines,On routes to Cape Breton University</h4>
+                            <h5 className="text-3xl font-light leading-snug">
+                                Sydney<br />
+                                New Waterford<br />
+                                Sydney Mines<br />
+                                North Sydney<br />
+                                Glace Bay<br />
+                                On routes to Cape Breton University
+                            </h5>
                         </div>
                     </div>
                     <div className="lg:pl-16">
@@ -203,7 +231,7 @@ export default function Welcome(props) {
                         <h2 className={`text-4xl md:text-5xl font-bold tracking-tighter mb-6 opacity-0 ${isOffersVisible ? 'animate-fade-in-up' : ''}`} style={isOffersVisible ? { animationDelay: '0.1s', animationFillMode: 'forwards' } : {}}>What We Offer</h2>
                         <div className={`w-12 h-[3px] bg-brand-black mx-auto rounded-full opacity-0 ${isOffersVisible ? 'animate-fade-in-up' : ''}`} style={isOffersVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}></div>
                         <p className={`mt-8 text-gray-500 font-light max-w-2xl mx-auto text-lg leading-relaxed opacity-0 ${isOffersVisible ? 'animate-fade-in-up' : ''}`} style={isOffersVisible ? { animationDelay: '0.3s', animationFillMode: 'forwards' } : {}}>
-                            Living experiences with dedicated support across Sydney and Cape Breton.
+                            With dedicated support across Sydney and Cape Breton.
                         </p>
                     </div>
 
@@ -244,18 +272,18 @@ export default function Welcome(props) {
                         <h2 className="text-5xl md:text-6xl font-bold tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-r from-brand-black to-gray-500">Questions about an available apartment?</h2>
                         <div className="w-12 h-[3px] bg-brand-black mb-8 rounded-full"></div>
                         <p className="text-xl text-brand-gray font-light mb-12 leading-relaxed max-w-lg">
-                            Contact Island Residential today to learn more about current rental availability in Sydney, Nova Scotia and Cape Breton.
+                            Contact Island Residential to learn more about apartments for rent in Sydney and across Cape Breton.
                         </p>
 
                         <div className="bg-white/60 backdrop-blur-xl border border-white rounded-3xl p-8 shadow-xl">
                             <h4 className="font-bold uppercase tracking-widest text-xs mb-6 text-brand-black">We regularly assist tenants searching for:</h4>
                             <ul className="space-y-4 font-light text-brand-gray">
-                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> apartments for rent Sydney NS</li>
-                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> houses for rent near me</li>
-                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> Cape Breton rentals</li>
-                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> student housing near CBU</li>
-                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> property management Cape Breton</li>
-                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> Sydney NS apartment rentals</li>
+                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> Apartments for rent in Sydney NS</li>
+                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> 1 bedroom apartments for rent</li>
+                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> 2 bedroom apartments for rent</li>
+                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> Off-campus apartments</li>
+                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> Pet friend friendly apartments</li>
+                                <li className="flex items-center group"><span className="w-6 h-6 rounded-full bg-brand-black/5 flex items-center justify-center text-brand-black mr-4 group-hover:bg-brand-black group-hover:text-brand-white transition-colors text-xs">✓</span> Healthcare professionals relocations</li>
                             </ul>
                         </div>
                     </div>
@@ -343,7 +371,7 @@ export default function Welcome(props) {
                         <Link href="/" className="inline-block mb-6">
                             <img src="/images/media__1779672706531.png" alt="Island Residential Property Management Logo" className="h-12 md:h-36 w-auto object-contain brightness-0 invert" />
                         </Link>
-                        <p className="text-brand-light font-light text-lg max-w-sm">Discover premium <strong>apartments for rent in Sydney, NS</strong>, and throughout <strong>Cape Breton, Nova Scotia</strong>. </p>
+                        <p className="text-brand-light font-light text-lg max-w-sm">Discover <strong>apartments for rent in Sydney, NS</strong>, and throughout <strong>Cape Breton, Nova Scotia</strong>. </p>
                     </div>
                     <div>
                         <h4 className="font-bold mb-8 uppercase tracking-[0.2em] text-xs text-gray-400">Navigation</h4>
@@ -370,7 +398,7 @@ export default function Welcome(props) {
                 {/* GEO & AIO Optimized Bottom Section */}
                 <div className="max-w-[1400px] mx-auto mt-16 pt-8 border-t border-brand-white/10 text-center md:text-left">
                     <p className="text-xs text-gray-400 leading-loose max-w-5xl">
-                        Island Residential offers professionally managed properties, including 1 and 2-bedroom apartments, convenient <strong>off-campus housing near Cape Breton University (CBU)</strong>, and reliable long-term rentals in Sydney, NS. Experience exceptional property management dedicated to your comfort and peace of mind.
+                        Island Residential offers professionally managed properties, including 1 and 2-bedroom apartments, convenient off-campus housing near Cape Breton University (CBU), and reliable long-term rentals in Sydney, NS. Property management dedicated to your comfort and peace of mind.
                     </p>
                     <p className="mt-6 text-[10px] text-gray-500 uppercase tracking-widest">
                         &copy; {new Date().getFullYear()} Island Residential. All rights reserved.
