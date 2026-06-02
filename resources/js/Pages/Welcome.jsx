@@ -193,7 +193,7 @@ export default function Welcome(props) {
                 <div className="grid lg:grid-cols-2 gap-20 items-center">
                     <div className="relative">
                         <div className={`overflow-hidden rounded-[2.5rem] shadow-2xl ${isSectionVisible ? 'animate-reveal' : 'opacity-0'}`}>
-                            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Minimalist Interior" className="w-full h-[700px] object-cover hover:scale-105 transition-transform duration-1000" />
+                            <img src="/images/apartments-for-rent-sydney-ns-cape-breton-big-fiddle.jpg" alt="The Big Fiddle in Sydney Nova Scotia, representing the local culture near Island Residential apartments for rent in Cape Breton" className="w-full h-[700px] object-cover hover:scale-105 transition-transform duration-1000" />
                         </div>
                         <div className={`absolute -bottom-10 -right-10 bg-brand-black text-brand-white p-12 max-w-sm shadow-2xl rounded-3xl opacity-0 ${isSectionVisible ? 'animate-slide-in-right' : ''}`} style={isSectionVisible ? { animationDelay: '0.5s', animationFillMode: 'forwards' } : {}}>
                             <p className="font-bold tracking-widest uppercase text-xs mb-4 text-brand-light">Apartments in </p>
