@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $recentMaintenance  = MaintenanceRequest::latest()->take(5)->get();
 
         $settings = [
-            'maintenance_email' => Setting::get('maintenance_email', 'info@islandresidential.ca'),
+            'maintenance_email' => Setting::get('maintenance_email', 'rent@islandresidential.ca'),
             'rental_email'      => Setting::get('rental_email', 'info@islandresidential.ca'),
         ];
 
@@ -36,4 +36,3 @@ class DashboardController extends Controller
         ]);
     }
 }
-

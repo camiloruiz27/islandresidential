@@ -23,7 +23,8 @@ class MaintenanceRequestController extends Controller
             'city' => 'required|string|max:100',
             'unit' => 'required|string|max:50',
             'issue_description' => 'required|string',
-            'photos.*' => 'required|file|mimes:jpg,jpeg,png,mp4,mov|max:20480', // max 20MB per file
+            'photos' => 'required|array|min:1',
+            'photos.*' => 'file|mimes:jpg,jpeg,png,mp4,mov|max:20480', // max 20MB per file
         ];
 
         if (!app()->environment('local')) {
@@ -70,7 +71,7 @@ class MaintenanceRequestController extends Controller
         ]);
 
         // Send Email
-        $maintenanceEmail = Setting::get('maintenance_email', 'info@islandresidential.ca');
+        $maintenanceEmail = Setting::get('maintenance_email', 'rent@islandresidential.ca');
         Mail::to($maintenanceEmail)->send(new FormSubmittedNotification($maintenanceRequest->toArray(), 'Maintenance Request'));
 
         return back()->with('success', 'Maintenance request submitted.');

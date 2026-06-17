@@ -62,7 +62,7 @@ function SettingsWidget({ settings }) {
                             className={`w-full pl-8 pr-4 py-3.5 rounded-xl border bg-gray-50 text-sm focus:outline-none focus:border-black focus:bg-white transition-colors ${errors.maintenance_email ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
                             value={data.maintenance_email}
                             onChange={e => setData('maintenance_email', e.target.value)}
-                            placeholder="maintenance@example.com"
+                            placeholder="rent@islandresidential.ca"
                             required
                         />
                     </div>
