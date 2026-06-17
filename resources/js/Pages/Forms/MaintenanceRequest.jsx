@@ -3,10 +3,9 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function MaintenanceRequest() {
     const isLocal = typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
-    const { recaptcha } = usePage().props;
+    const { recaptcha, flash } = usePage().props;
     const recaptchaSiteKey = recaptcha?.siteKey ?? '';
-    const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
-        user_type: '',
+    const { data, setData, post, processing, errors } = useForm({
         street_address: '',
         city: '',
         unit: '',
@@ -52,31 +51,16 @@ export default function MaintenanceRequest() {
                     <p className="text-lg text-brand-gray font-light">Submit a maintenance request and our team will attend to it shortly. Fields marked with * are required.</p>
                 </div>
 
-                {recentlySuccessful ? (
+                {flash?.success ? (
                     <div className="bg-green-50 border border-green-200 text-green-800 p-10 shadow-sm rounded-3xl animate-scale-up">
-                        <h3 className="font-bold text-2xl mb-4 tracking-tight">Thank you for your submission!</h3>
-                        <p className="font-light text-lg mb-8">We have received your maintenance request and our team will be in touch within 3 business days.</p>
+                        <h3 className="font-bold text-2xl mb-4 tracking-tight">Request received.</h3>
+                        <p className="font-light text-lg mb-8">{flash.success}</p>
                         <button onClick={() => window.location.reload()} className="text-sm font-bold tracking-[0.2em] uppercase border-b-2 border-green-800 pb-1 hover:text-green-600 hover:border-green-600 transition-colors">Submit another</button>
                     </div>
                 ) : (
                     <form onSubmit={submit} className="bg-white border border-gray-100 shadow-2xl p-8 md:p-12 rounded-[2.5rem] animate-fade-in-up opacity-0" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
                         
                         <div className="space-y-8">
-                            <div>
-                                <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">Tenant or Homeowner? *</label>
-                                <select 
-                                    className={fieldClass('user_type')}
-                                    value={data.user_type} 
-                                    onChange={e => setData('user_type', e.target.value)} 
-                                    required
-                                >
-                                    <option value="">Please Select</option>
-                                    <option value="Tenant">Tenant</option>
-                                    <option value="Homeowner">Homeowner</option>
-                                </select>
-                                {errors.user_type && <p className="text-red-500 text-xs mt-2 pl-4">{errors.user_type}</p>}
-                            </div>
-
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">Street Address *</label>

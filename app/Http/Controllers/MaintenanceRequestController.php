@@ -16,7 +16,6 @@ class MaintenanceRequestController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'user_type' => 'required|string',
             'tenant_name' => 'required|string|max:255',
             'tenant_email' => 'required|email|max:255',
             'tenant_phone' => 'required|string|max:20',
@@ -64,8 +63,7 @@ class MaintenanceRequestController extends Controller
             }
         }
 
-        $fullDescription = "User Type: " . $request->user_type . "\n" .
-                           "Address: " . $request->street_address . ", " . $request->city . "\n\n" .
+        $fullDescription = "Address: " . $request->street_address . ", " . $request->city . "\n\n" .
                            "Issue Description:\n" . $request->issue_description;
 
         $maintenanceRequest = MaintenanceRequest::create([
@@ -82,7 +80,9 @@ class MaintenanceRequestController extends Controller
         $maintenanceEmail = Setting::get('maintenance_email', 'rent@islandresidential.ca');
         Mail::to($maintenanceEmail)->send(new FormSubmittedNotification($maintenanceRequest->toArray(), 'Maintenance Request'));
 
-        return back()->with('success', 'Maintenance request submitted.');
+        return redirect()
+            ->route('forms.maintenance')
+            ->with('success', 'Thank you for submitting your maintenance request. We have received it and we will be in touch within 48 hours.');
     }
 
     /**
