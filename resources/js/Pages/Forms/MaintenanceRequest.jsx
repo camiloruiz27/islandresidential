@@ -1,8 +1,10 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function MaintenanceRequest() {
     const isLocal = typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
+    const { recaptcha } = usePage().props;
+    const recaptchaSiteKey = recaptcha?.siteKey ?? '';
     const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
         user_type: '',
         street_address: '',
@@ -15,6 +17,9 @@ export default function MaintenanceRequest() {
         photos: null,
         captcha_token: ''
     });
+
+    const fieldClass = (field) => `w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100 ${errors[field] ? 'border-red-300 bg-red-50' : ''}`;
+    const fileError = errors.photos || errors['photos.0'];
 
     const submit = (e) => {
         e.preventDefault();
@@ -60,7 +65,7 @@ export default function MaintenanceRequest() {
                             <div>
                                 <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">Tenant or Homeowner? *</label>
                                 <select 
-                                    className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100" 
+                                    className={fieldClass('user_type')}
                                     value={data.user_type} 
                                     onChange={e => setData('user_type', e.target.value)} 
                                     required
@@ -69,6 +74,7 @@ export default function MaintenanceRequest() {
                                     <option value="Tenant">Tenant</option>
                                     <option value="Homeowner">Homeowner</option>
                                 </select>
+                                {errors.user_type && <p className="text-red-500 text-xs mt-2 pl-4">{errors.user_type}</p>}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -77,32 +83,35 @@ export default function MaintenanceRequest() {
                                     <input 
                                         type="text" 
                                         placeholder="E.g. 123 evergreen" 
-                                        className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100" 
+                                        className={fieldClass('street_address')}
                                         value={data.street_address} 
                                         onChange={e => setData('street_address', e.target.value)} 
                                         required 
                                     />
+                                    {errors.street_address && <p className="text-red-500 text-xs mt-2 pl-4">{errors.street_address}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">City *</label>
                                     <input 
                                         type="text" 
                                         placeholder="E.g. Halifax" 
-                                        className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100" 
+                                        className={fieldClass('city')}
                                         value={data.city} 
                                         onChange={e => setData('city', e.target.value)} 
                                         required 
                                     />
+                                    {errors.city && <p className="text-red-500 text-xs mt-2 pl-4">{errors.city}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">Unit *</label>
                                     <input 
                                         type="text" 
-                                        className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100" 
+                                        className={fieldClass('unit')}
                                         value={data.unit} 
                                         onChange={e => setData('unit', e.target.value)} 
                                         required 
                                     />
+                                    {errors.unit && <p className="text-red-500 text-xs mt-2 pl-4">{errors.unit}</p>}
                                 </div>
                             </div>
 
@@ -112,7 +121,7 @@ export default function MaintenanceRequest() {
                                     <input 
                                         type="text" 
                                         placeholder="E.g. John Doe" 
-                                        className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100" 
+                                        className={fieldClass('tenant_name')}
                                         value={data.tenant_name} 
                                         onChange={e => setData('tenant_name', e.target.value)} 
                                         required 
@@ -124,7 +133,7 @@ export default function MaintenanceRequest() {
                                     <input 
                                         type="email" 
                                         placeholder="E.g. john@doe.com" 
-                                        className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100" 
+                                        className={fieldClass('tenant_email')}
                                         value={data.tenant_email} 
                                         onChange={e => setData('tenant_email', e.target.value)} 
                                         required 
@@ -136,7 +145,7 @@ export default function MaintenanceRequest() {
                                     <input 
                                         type="tel" 
                                         placeholder="(000) 000-0000" 
-                                        className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100" 
+                                        className={fieldClass('tenant_phone')}
                                         value={data.tenant_phone} 
                                         onChange={e => setData('tenant_phone', e.target.value)} 
                                         required 
@@ -148,7 +157,7 @@ export default function MaintenanceRequest() {
                             <div>
                                 <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">Details of the service needed or concern *</label>
                                 <textarea 
-                                    className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-colors bg-gray-50 hover:bg-gray-100" 
+                                    className={fieldClass('issue_description')}
                                     rows="5" 
                                     placeholder="Add the information here..." 
                                     value={data.issue_description} 
@@ -169,25 +178,34 @@ export default function MaintenanceRequest() {
                                         type="file" 
                                         multiple
                                         required
-                                        className="block w-full text-sm text-gray-500 file:mr-6 file:py-3 file:px-6 file:border-0 file:text-xs file:uppercase file:tracking-widest file:font-bold file:bg-brand-black file:text-white file:rounded-full hover:file:bg-gray-800 transition-colors file:cursor-pointer cursor-pointer border border-dashed border-gray-300 rounded-2xl p-4 bg-white" 
+                                        className={`block w-full text-sm text-gray-500 file:mr-6 file:py-3 file:px-6 file:border-0 file:text-xs file:uppercase file:tracking-widest file:font-bold file:bg-brand-black file:text-white file:rounded-full hover:file:bg-gray-800 transition-colors file:cursor-pointer cursor-pointer border border-dashed rounded-2xl p-4 bg-white ${fileError ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
                                         onChange={e => setData('photos', e.target.files)} 
                                     />
+                                    {fileError && <p className="text-red-500 text-xs mt-2">{fileError}</p>}
                                 </div>
                             </div>
 
                             {!isLocal && (
-                                <div className="mt-8 flex justify-center">
-                                    <ReCAPTCHA
-                                        sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"} // Fallback test key
-                                        onChange={(token) => setData('captcha_token', token)}
-                                    />
+                                <div className="mt-8 flex flex-col items-center">
+                                    {recaptchaSiteKey ? (
+                                        <ReCAPTCHA
+                                            sitekey={recaptchaSiteKey}
+                                            onChange={(token) => setData('captcha_token', token || '')}
+                                            onExpired={() => setData('captcha_token', '')}
+                                        />
+                                    ) : (
+                                        <p className="text-red-500 text-xs text-center max-w-md">
+                                            reCAPTCHA is unavailable because the site key is not configured on the server.
+                                        </p>
+                                    )}
+                                    {errors.captcha_token && <p className="text-red-500 text-xs mt-3 text-center">{errors.captcha_token}</p>}
                                 </div>
                             )}
 
                             <div className="pt-8 border-t border-gray-100 flex justify-end mt-8">
                                 <button 
                                     type="submit" 
-                                    disabled={processing || (!isLocal && !data.captcha_token)} 
+                                    disabled={processing || (!isLocal && (!recaptchaSiteKey || !data.captcha_token))} 
                                     className="group relative px-12 py-5 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50"
                                 >
                                     <span className="relative z-10">{processing ? 'Sending...' : 'Send Message'}</span>

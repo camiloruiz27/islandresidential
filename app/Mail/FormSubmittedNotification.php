@@ -34,8 +34,10 @@ class FormSubmittedNotification extends Mailable
      */
     public function envelope()
     {
+        $subjectPrefix = app()->environment('local') ? '[TEST EMAIL] ' : '';
+
         return new Envelope(
-            subject: 'New Submission: ' . $this->formType,
+            subject: $subjectPrefix . 'New Submission: ' . $this->formType,
         );
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use App\Mail\FormSubmittedNotification;
 
 class MaintenanceRequestController extends Controller
@@ -23,7 +24,8 @@ class MaintenanceRequestController extends Controller
             'city' => 'required|string|max:100',
             'unit' => 'required|string|max:50',
             'issue_description' => 'required|string',
-            'photos.*' => 'required|file|mimes:jpg,jpeg,png,mp4,mov|max:20480', // max 20MB per file
+            'photos' => 'required|array|min:1',
+            'photos.*' => 'file|mimes:jpg,jpeg,png,mp4,mov|max:20480', // max 20MB per file
         ];
 
         if (!app()->environment('local')) {
@@ -34,7 +36,14 @@ class MaintenanceRequestController extends Controller
 
         // Verify reCAPTCHA
         if (!app()->environment('local')) {
-            $secret = env('RECAPTCHA_SECRET_KEY', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe');
+            $secret = config('services.recaptcha.secret_key');
+
+            if (blank($secret)) {
+                throw ValidationException::withMessages([
+                    'captcha_token' => 'reCAPTCHA is not configured on the server.',
+                ]);
+            }
+
             $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
                 'secret' => $secret,
                 'response' => $request->captcha_token,
@@ -70,7 +79,7 @@ class MaintenanceRequestController extends Controller
         ]);
 
         // Send Email
-        $maintenanceEmail = Setting::get('maintenance_email', 'info@islandresidential.ca');
+        $maintenanceEmail = Setting::get('maintenance_email', 'rent@islandresidential.ca');
         Mail::to($maintenanceEmail)->send(new FormSubmittedNotification($maintenanceRequest->toArray(), 'Maintenance Request'));
 
         return back()->with('success', 'Maintenance request submitted.');

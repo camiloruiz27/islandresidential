@@ -40,6 +40,9 @@ class HandleInertiaRequests extends Middleware
                 ]);
             },
             'isProduction' => !app()->environment('local'),
+            'recaptcha' => [
+                'siteKey' => config('services.recaptcha.site_key'),
+            ],
         ]);
     }
 }
