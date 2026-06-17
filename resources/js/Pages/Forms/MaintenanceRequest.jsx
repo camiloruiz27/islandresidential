@@ -1,8 +1,10 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function MaintenanceRequest() {
     const isLocal = typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
+    const { recaptcha } = usePage().props;
+    const recaptchaSiteKey = recaptcha?.siteKey ?? '';
     const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
         user_type: '',
         street_address: '',
@@ -185,10 +187,17 @@ export default function MaintenanceRequest() {
 
                             {!isLocal && (
                                 <div className="mt-8 flex flex-col items-center">
-                                    <ReCAPTCHA
-                                        sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"} // Fallback test key
-                                        onChange={(token) => setData('captcha_token', token)}
-                                    />
+                                    {recaptchaSiteKey ? (
+                                        <ReCAPTCHA
+                                            sitekey={recaptchaSiteKey}
+                                            onChange={(token) => setData('captcha_token', token || '')}
+                                            onExpired={() => setData('captcha_token', '')}
+                                        />
+                                    ) : (
+                                        <p className="text-red-500 text-xs text-center max-w-md">
+                                            reCAPTCHA is unavailable because the site key is not configured on the server.
+                                        </p>
+                                    )}
                                     {errors.captcha_token && <p className="text-red-500 text-xs mt-3 text-center">{errors.captcha_token}</p>}
                                 </div>
                             )}
@@ -196,7 +205,7 @@ export default function MaintenanceRequest() {
                             <div className="pt-8 border-t border-gray-100 flex justify-end mt-8">
                                 <button 
                                     type="submit" 
-                                    disabled={processing || (!isLocal && !data.captcha_token)} 
+                                    disabled={processing || (!isLocal && (!recaptchaSiteKey || !data.captcha_token))} 
                                     className="group relative px-12 py-5 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50"
                                 >
                                     <span className="relative z-10">{processing ? 'Sending...' : 'Send Message'}</span>
