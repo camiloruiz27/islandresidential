@@ -46,6 +46,7 @@ export default function RentalApplication({ apartments = [] }) {
             co_applicants: [],
             why_consider_you: '',
             criminal_offense: '',
+            bankruptcy_or_consumer_proposal: '',
             sin_number: '',
             declarations_agreed: false,
             terms_agreed: false
@@ -535,6 +536,33 @@ export default function RentalApplication({ apartments = [] }) {
                                             <input type="text" className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors" value={data.application_data.sin_number} onChange={e => handleDataChange('sin_number', e.target.value)} />
                                         </div>
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-4 uppercase tracking-wider pl-4">Have you ever filed for bankruptcy or consumer proposal? *</label>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <label className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4 cursor-pointer hover:border-brand-black transition-colors">
+                                                <input
+                                                    type="radio"
+                                                    name="bankruptcy_or_consumer_proposal"
+                                                    value="Yes"
+                                                    checked={data.application_data.bankruptcy_or_consumer_proposal === 'Yes'}
+                                                    onChange={e => handleDataChange('bankruptcy_or_consumer_proposal', e.target.value)}
+                                                    required
+                                                />
+                                                <span className="text-sm font-medium text-brand-black">Yes</span>
+                                            </label>
+                                            <label className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4 cursor-pointer hover:border-brand-black transition-colors">
+                                                <input
+                                                    type="radio"
+                                                    name="bankruptcy_or_consumer_proposal"
+                                                    value="No"
+                                                    checked={data.application_data.bankruptcy_or_consumer_proposal === 'No'}
+                                                    onChange={e => handleDataChange('bankruptcy_or_consumer_proposal', e.target.value)}
+                                                    required
+                                                />
+                                                <span className="text-sm font-medium text-brand-black">No</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div className="bg-gray-50 p-8 border border-gray-100 mt-6 rounded-3xl">
                                         <h4 className="font-bold mb-4 uppercase tracking-[0.1em] text-sm border-b border-gray-200 pb-4">File Uploads</h4>
                                         <p className="text-xs text-gray-500 mb-6 leading-relaxed max-w-xl">Please note viewing priority will be given to applicants who attach all documents from the start.</p>
@@ -570,9 +598,9 @@ export default function RentalApplication({ apartments = [] }) {
                                         <label className="flex items-start gap-4 cursor-pointer">
                                             <input type="checkbox" className="mt-1 border-gray-300 text-brand-gray focus:ring-brand-white focus:ring-offset-brand-black rounded" checked={data.application_data.terms_agreed} onChange={e => handleDataChange('terms_agreed', e.target.checked)} required />
                                             <div>
-                                                <div className="font-bold mb-1 tracking-wider uppercase text-sm">Privacy Policy *</div>
-                                                <div className="text-sm font-light opacity-90 leading-relaxed">
-                                                    I have read and accept the <a href={route('privacy.policy')} target="_blank" className="underline hover:text-gray-300 transition-colors">Privacy and Data Handling Policy</a> and verify that the above information is true and accurate to the best of my knowledge.
+                                                <div className="font-bold mb-1 tracking-wider uppercase text-sm">Terms and Conditions and Privacy Policy *</div>
+                                                <div className="text-sm font-light opacity-90 leading-relaxed" style={{ lineHeight: '1.6', fontSize: '0.875rem' }}>
+                                                    By checking this box, I (we), the Applicant(s), explicitly authorize and consent to the Landlord or their agent obtaining and viewing credit, financial, and related personal or business information, as well as tenancy history about the Applicant (including credit reports, credit scores, and tenant records) from past and present Landlords and from credit reporting agencies (such as Equifax, TransUnion, and the Landlord Credit Bureau) from time to time for the purposes of assessing the Applicant’s current and ongoing eligibility for tenancy. The Applicant(s) grant permission to contact the references listed in this application, both now and in the future, for rental consideration. The Applicant(s) acknowledge and understand that personal information will be collected, processed, and stored in accordance with the <a href={route('privacy.policy')} target="_blank" className="underline hover:text-gray-300 transition-colors">Terms and Conditions and Privacy Policy </a> for now and future rental applications or for collections purposes should they be deemed necessary The consents provided are effective as of the date of this Application and will remain valid for as long as required to fulfill the purposes described herein.
                                                 </div>
                                             </div>
                                         </label>

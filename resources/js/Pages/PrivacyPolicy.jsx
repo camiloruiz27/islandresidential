@@ -36,7 +36,7 @@ export default function PrivacyPolicy() {
                         <span className="text-gray-400 font-light">Data Handling.</span>
                     </h1>
                     <div className="w-12 h-[3px] bg-brand-black mb-8 rounded-full"></div>
-                    <div className="text-sm font-bold tracking-widest uppercase text-gray-500 mb-2">Last Updated: May 25, 2026</div>
+                    <div className="text-sm font-bold tracking-widest uppercase text-gray-500 mb-2">Last Updated: June 22, 2026</div>
                     <div className="text-sm font-bold tracking-widest uppercase text-gray-500 mb-2">Data Controller: Island Residential</div>
                     <div className="text-sm font-bold tracking-widest uppercase text-gray-500">Website: islandresidential.ca</div>
                 </div>
@@ -48,7 +48,7 @@ export default function PrivacyPolicy() {
 
                     <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Information We Collect</h2>
                     <p>
-                        To properly evaluate rental applications, we collect personal information when you complete our application form. This includes identification and contact details such as your full name, date of birth, cell phone number, email address, current address, and a government-issued photo ID. We also collect occupation details including the number of occupants, presence of smokers or pets, and parking requirements. To assess your suitability as a tenant, we gather your rental history, reasons for moving, employment status, income details including co-applicant income, and supporting documents like employment letters, paystubs, and credit checks. Furthermore, we collect background information regarding vehicles and any criminal offense charges to determine if further background checks are required.
+                        To properly evaluate rental applications, we collect personal information when you complete our application form. This includes identification and contact details such as your full name, date of birth, cell phone number, email address, current address, and a government-issued photo ID. We also collect occupation details including the number of occupants, presence of smokers or pets, and parking requirements. To assess your suitability as a tenant, we gather your rental history, reasons for moving, employment status, income details including co-applicant income, supporting documents like employment letters, paystubs, and credit checks, and declarations about whether you have ever filed for bankruptcy or a consumer proposal. Furthermore, we collect background information regarding vehicles and any criminal offense charges to determine if further background checks are required.
                     </p>
                     <p className="mt-4">
                         <strong>Partial Form Submissions:</strong> Please note that our application form saves partial data as a "draft" as you progress through the steps. This means we may collect and store the contact information you provide in the first section even if you do not complete the final submission, enabling us to assist you with your application process. Technical data regarding your website visit is also collected through the use of cookies.
@@ -69,6 +69,17 @@ export default function PrivacyPolicy() {
                         We will retain your personal information only for as long as necessary to fulfill the purposes for which it was collected. If your rental application is not approved, your information and all attached documents will be securely kept for a period of three years from the date of submission, after which they will be permanently deleted. If you are approved and become a tenant, your application information will be retained for the entire duration of your lease agreement and for an additional three years after you vacate the property, in order to comply with legal and administrative requirements.
                     </p>
 
+                    <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Applicant Declarations & Consent</h2>
+                    <p>
+                        By submitting a rental application, you explicitly agree to the following declarations:
+                        <ul className="list-disc pl-6 mt-4 space-y-2">
+                            <li>The Applicant(s) grant permission to contact the personal references listed above, both now and in the future for rental consideration or for collection purposes should they be deemed necessary.</li>
+                            <li>The Applicant(s) grant permission to obtain and/or exchange personal or financial information from/with any personal information credit agency towards verifying or establishing my financial standing.</li>
+                            <li>The Applicant(s) acknowledge and understand that personal information will be collected, processed, and stored for the purposes of now and future rental applications or for collections purposes should they be deemed necessary.</li>
+                            <li>The Applicant hereby consents to the Landlord or their agent obtaining and viewing credit, financial and related personal or business information, and Tenant history about the Applicant (including credit reports, credit scores and Tenant records), from past and present Landlords and from the reporting agencies known as Equifax, TransUnion and Landlord Credit Bureau, from time to time for the purposes of assessing the Applicant’s current and ongoing eligibility for tenancy.  The consents provided are effective as of the date of this Application and will be valid for as long as required to fulfill the purposes described herein.</li>
+                            <li>Disclosure to Credit Bureaus.  If the Applicant is granted tenancy with the Landlord, the Applicant hereby consents to the Landlord or their agent disclosing personally identifying information about the Applicant and information about their tenancy, including but not limited to the amount and timing of rent payments, good behaviour, problematic behaviour, any debt outstanding, and reviews of the Landlord’s experience regarding the Applicant, to Equifax, TransUnion, Landlord Credit Bureau and other reporting agencies, which may then be used in a Tenant record, credit report and credit score for the Applicant and shared with other Landlords and credit grantors</li>
+                        </ul>
+                    </p>
                     <h2 className="text-2xl font-bold tracking-tight text-brand-black mt-12 mb-4">Security Measures</h2>
                     <p>
                         Given the highly sensitive nature of the data collected, including government IDs and financial records, we implement strict physical, organizational, and technological security measures. These safeguards are designed to protect your personal information against loss, theft, unauthorized access, disclosure, copying, or modification.
