@@ -64,14 +64,14 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 // Public properties and forms
 Route::get('/properties', function () {
     return Inertia::render('Properties/Index', [
-        'apartments' => \App\Models\Apartment::where('status', 'available')->get()
+        'apartments' => \App\Models\Apartment::where('status', 'available')->get()->map->resolveImages()
     ]);
 })->name('properties.index');
 
 Route::get('/properties/{apartment}', function (\App\Models\Apartment $apartment) {
     abort_if($apartment->status === 'hidden', 404);
     return Inertia::render('Properties/Show', [
-        'apartment' => $apartment
+        'apartment' => $apartment->resolveImages()
     ]);
 })->name('properties.show');
 
