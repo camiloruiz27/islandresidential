@@ -13,7 +13,7 @@ class ApartmentController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Apartments/Index', [
-            'apartments' => Apartment::latest()->get(),
+            'apartments' => Apartment::latest()->get()->map->resolveImages(),
             'flash' => session()->only(['success']),
         ]);
     }
@@ -41,7 +41,7 @@ class ApartmentController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('apartments', 'public');
-                $imageUrls[] = Storage::url($path);
+                $imageUrls[] = $path;
             }
         }
 
@@ -54,13 +54,13 @@ class ApartmentController extends Controller
 
     public function show(Apartment $apartment)
     {
-        return Inertia::render('Admin/Apartments/Show', ['apartment' => $apartment]);
+        return Inertia::render('Admin/Apartments/Show', ['apartment' => $apartment->resolveImages()]);
     }
 
     public function edit(Apartment $apartment)
     {
         return Inertia::render('Admin/Apartments/Edit', [
-            'apartment' => $apartment,
+            'apartment' => $apartment->resolveImages(),
         ]);
     }
 
@@ -86,7 +86,7 @@ class ApartmentController extends Controller
         // Find images that were removed by the admin and delete them from storage
         $imagesToDelete = array_diff($currentImages, $imagesToKeep);
         foreach ($imagesToDelete as $oldUrl) {
-            $path = str_replace('/storage/', '', $oldUrl);
+            $path = $this->normalizeStoredImagePath($oldUrl);
             Storage::disk('public')->delete($path);
         }
 
@@ -97,7 +97,7 @@ class ApartmentController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('apartments', 'public');
-                $finalImages[] = Storage::url($path);
+                $finalImages[] = $path;
             }
         }
 
@@ -114,11 +114,31 @@ class ApartmentController extends Controller
         // Delete images from storage
         if ($apartment->images) {
             foreach ($apartment->images as $oldUrl) {
-                $path = str_replace('/storage/', '', $oldUrl);
+                $path = $this->normalizeStoredImagePath($oldUrl);
                 Storage::disk('public')->delete($path);
             }
         }
         $apartment->delete();
         return redirect()->route('admin.apartments.index')->with('success', 'Apartment deleted.');
+    }
+
+    private function normalizeStoredImagePath(string $image): string
+    {
+        $image = trim($image);
+        $appUrl = rtrim((string) config('app.url'), '/');
+
+        if ($appUrl !== '' && str_starts_with($image, $appUrl.'/storage/')) {
+            return ltrim(substr($image, strlen($appUrl.'/storage/')), '/');
+        }
+
+        if (str_starts_with($image, '/storage/')) {
+            return ltrim(substr($image, strlen('/storage/')), '/');
+        }
+
+        if (str_starts_with($image, 'storage/')) {
+            return ltrim(substr($image, strlen('storage/')), '/');
+        }
+
+        return ltrim($image, '/');
     }
 }

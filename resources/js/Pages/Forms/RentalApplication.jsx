@@ -579,22 +579,6 @@ export default function RentalApplication({ apartments = [] }) {
                                     </div>
 
                                     <div className="bg-brand-black text-brand-white p-8 mt-8 rounded-3xl space-y-6">
-                                        <div className="text-sm font-light opacity-90 leading-relaxed space-y-4 pb-6 border-b border-gray-700">
-                                            <p>I, the undersigned, grant permission to contact the personal references listed above, both now and in the future for rental consideration or for collection purposes should they be deemed necessary.</p>
-                                            <p>I, the undersigned, grant permission to obtain and/or exchange personal or financial information from/with any personal information agency towards verifying or establishing my financial standing.</p>
-                                            <p>I, the undersigned, acknowledge and understand that personal information will be collected, processed, and stored for the purposes of now and future rental applications or for collections purposes should they be deemed necessary.</p>
-                                        </div>
-                                        
-                                        <label className="flex items-start gap-4 cursor-pointer">
-                                            <input type="checkbox" className="mt-1 border-gray-300 text-brand-gray focus:ring-brand-white focus:ring-offset-brand-black rounded" checked={data.application_data.declarations_agreed} onChange={e => handleDataChange('declarations_agreed', e.target.checked)} required />
-                                            <div>
-                                                <div className="font-bold mb-1 tracking-wider uppercase text-sm">Applicant Declarations & Consent *</div>
-                                                <div className="text-sm font-light opacity-90 leading-relaxed">
-                                                    I have read, understood, and agree to the declarations above.
-                                                </div>
-                                            </div>
-                                        </label>
-
                                         <label className="flex items-start gap-4 cursor-pointer">
                                             <input type="checkbox" className="mt-1 border-gray-300 text-brand-gray focus:ring-brand-white focus:ring-offset-brand-black rounded" checked={data.application_data.terms_agreed} onChange={e => handleDataChange('terms_agreed', e.target.checked)} required />
                                             <div>
