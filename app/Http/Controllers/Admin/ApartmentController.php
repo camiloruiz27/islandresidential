@@ -77,6 +77,9 @@ class ApartmentController extends Controller
             'has_parking' => 'boolean',
             'images_to_keep' => 'nullable|array',
             'images_to_keep.*' => 'string',
+            'cover_image_source' => 'nullable|in:existing,new',
+            'cover_image' => 'nullable|string',
+            'cover_new_index' => 'nullable|integer|min:0',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
         ]);
 
@@ -101,8 +104,26 @@ class ApartmentController extends Controller
             }
         }
 
+        $coverImageSource = $request->input('cover_image_source');
+        $coverImage = $request->input('cover_image');
+        $coverNewIndex = $request->input('cover_new_index');
+
+        if ($coverImageSource === 'existing' && is_string($coverImage) && in_array($coverImage, $finalImages, true)) {
+            $finalImages = $this->moveImageToFront($finalImages, $coverImage);
+        }
+
+        if ($coverImageSource === 'new' && $coverNewIndex !== null) {
+            $newImagesStartIndex = count($imagesToKeep);
+            $coverImageAtIndex = $finalImages[$newImagesStartIndex + (int) $coverNewIndex] ?? null;
+
+            if (is_string($coverImageAtIndex)) {
+                $finalImages = $this->moveImageToFront($finalImages, $coverImageAtIndex);
+            }
+        }
+
         $validated['images'] = $finalImages;
         unset($validated['images_to_keep']);
+        unset($validated['cover_image_source'], $validated['cover_image'], $validated['cover_new_index']);
 
         $apartment->update($validated);
 
@@ -140,5 +161,17 @@ class ApartmentController extends Controller
         }
 
         return ltrim($image, '/');
+    }
+
+    private function moveImageToFront(array $images, string $targetImage): array
+    {
+        $filteredImages = array_values(array_filter(
+            $images,
+            fn (string $image): bool => $image !== $targetImage
+        ));
+
+        array_unshift($filteredImages, $targetImage);
+
+        return $filteredImages;
     }
 }
