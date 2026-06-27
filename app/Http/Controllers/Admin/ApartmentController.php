@@ -84,7 +84,11 @@ class ApartmentController extends Controller
         ]);
 
         $currentImages = $apartment->images ?: [];
-        $imagesToKeep = $request->input('images_to_keep', []);
+        $imagesToKeep = collect($request->input('images_to_keep', []))
+            ->filter(fn ($image) => is_string($image) && trim($image) !== '')
+            ->map(fn (string $image): string => $this->normalizeStoredImagePath($image))
+            ->values()
+            ->all();
 
         // Find images that were removed by the admin and delete them from storage
         $imagesToDelete = array_diff($currentImages, $imagesToKeep);
@@ -105,7 +109,9 @@ class ApartmentController extends Controller
         }
 
         $coverImageSource = $request->input('cover_image_source');
-        $coverImage = $request->input('cover_image');
+        $coverImage = $request->filled('cover_image')
+            ? $this->normalizeStoredImagePath((string) $request->input('cover_image'))
+            : null;
         $coverNewIndex = $request->input('cover_new_index');
 
         if ($coverImageSource === 'existing' && is_string($coverImage) && in_array($coverImage, $finalImages, true)) {
@@ -152,12 +158,24 @@ class ApartmentController extends Controller
             return ltrim(substr($image, strlen($appUrl.'/storage/')), '/');
         }
 
+        if ($appUrl !== '' && str_starts_with($image, $appUrl.'/apartment-images/')) {
+            return ltrim(substr($image, strlen($appUrl.'/apartment-images/')), '/');
+        }
+
         if (str_starts_with($image, '/storage/')) {
             return ltrim(substr($image, strlen('/storage/')), '/');
         }
 
+        if (str_starts_with($image, '/apartment-images/')) {
+            return ltrim(substr($image, strlen('/apartment-images/')), '/');
+        }
+
         if (str_starts_with($image, 'storage/')) {
             return ltrim(substr($image, strlen('storage/')), '/');
+        }
+
+        if (str_starts_with($image, 'apartment-images/')) {
+            return ltrim(substr($image, strlen('apartment-images/')), '/');
         }
 
         return ltrim($image, '/');
