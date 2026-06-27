@@ -25,21 +25,41 @@ class Apartment extends Model
         $this->images = collect($this->images ?? [])
             ->filter()
             ->map(function (string $image): string {
-                if (preg_match('/^https?:\/\//i', $image) || str_starts_with($image, '/storage/')) {
+                $normalized = $this->normalizeImagePath($image);
+
+                if ($normalized === null) {
                     return $image;
                 }
 
-                $normalized = ltrim($image, '/');
-
-                if (str_starts_with($normalized, 'storage/')) {
-                    return '/'.$normalized;
-                }
-
-                return Storage::url($normalized);
+                return route('public.apartment-image', ['path' => $normalized]);
             })
             ->values()
             ->all();
 
         return $this;
+    }
+
+    private function normalizeImagePath(string $image): ?string
+    {
+        $image = trim($image);
+        $appUrl = rtrim((string) config('app.url'), '/');
+
+        if ($appUrl !== '' && str_starts_with($image, $appUrl.'/storage/')) {
+            return ltrim(substr($image, strlen($appUrl.'/storage/')), '/');
+        }
+
+        if (preg_match('/^https?:\/\//i', $image)) {
+            return null;
+        }
+
+        if (str_starts_with($image, '/storage/')) {
+            return ltrim(substr($image, strlen('/storage/')), '/');
+        }
+
+        if (str_starts_with($image, 'storage/')) {
+            return ltrim(substr($image, strlen('storage/')), '/');
+        }
+
+        return ltrim($image, '/');
     }
 }
