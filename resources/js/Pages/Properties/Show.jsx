@@ -5,6 +5,7 @@ export default function Show({ apartment }) {
     const [scrolled, setScrolled] = useState(false);
     const [activeImage, setActiveImage] = useState(0);
     const [showBookingModal, setShowBookingModal] = useState(false);
+    const [showImageModal, setShowImageModal] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -13,6 +14,29 @@ export default function Show({ apartment }) {
     }, []);
 
     const images = apartment.images && apartment.images.length > 0 ? apartment.images : [];
+
+    useEffect(() => {
+        if (!showImageModal) {
+            return undefined;
+        }
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                setShowImageModal(false);
+            }
+
+            if (images.length > 1 && event.key === 'ArrowLeft') {
+                setActiveImage((i) => (i - 1 + images.length) % images.length);
+            }
+
+            if (images.length > 1 && event.key === 'ArrowRight') {
+                setActiveImage((i) => (i + 1) % images.length);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [showImageModal, images.length]);
 
     return (
         <div className="min-h-screen bg-brand-white text-brand-black font-sans selection:bg-brand-black selection:text-brand-white">
@@ -43,6 +67,19 @@ export default function Show({ apartment }) {
                                     alt={apartment.title}
                                     className="w-full h-full object-cover transition-opacity duration-700"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowImageModal(true)}
+                                    className="absolute top-6 right-6 w-14 h-14 rounded-full bg-white/85 backdrop-blur-sm flex items-center justify-center text-black hover:bg-white transition-all shadow-lg"
+                                    aria-label="View larger image"
+                                >
+                                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                        <circle cx="11" cy="11" r="7"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        <line x1="11" y1="8" x2="11" y2="14"></line>
+                                        <line x1="8" y1="11" x2="14" y2="11"></line>
+                                    </svg>
+                                </button>
                                 {images.length > 1 && (
                                     <div className="absolute bottom-6 right-6 bg-black/70 text-white text-xs font-bold px-4 py-2 rounded-full backdrop-blur-sm tracking-widest">
                                         {activeImage + 1} / {images.length}
@@ -257,6 +294,73 @@ export default function Show({ apartment }) {
                             Our team typically responds within a few hours.
                         </p>
                     </div>
+                </div>
+            )}
+
+            {showImageModal && images.length > 0 && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 p-4 md:p-8 animate-fade-in">
+                    <button
+                        type="button"
+                        onClick={() => setShowImageModal(false)}
+                        className="absolute top-5 right-5 md:top-8 md:right-8 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+                        aria-label="Close image viewer"
+                    >
+                        ✕
+                    </button>
+
+                    {images.length > 1 && (
+                        <button
+                            type="button"
+                            onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
+                            className="absolute left-3 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+                            aria-label="Previous image"
+                        >
+                            &larr;
+                        </button>
+                    )}
+
+                    <div className="w-full max-w-6xl max-h-full flex flex-col items-center">
+                        <div className="w-full flex items-center justify-center overflow-hidden rounded-[2rem]">
+                            <img
+                                src={images[activeImage]}
+                                alt={`${apartment.title} image ${activeImage + 1}`}
+                                className="max-w-full max-h-[78vh] object-contain"
+                            />
+                        </div>
+
+                        {images.length > 1 && (
+                            <div className="mt-6 text-white text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-center">
+                                {activeImage + 1} / {images.length}
+                            </div>
+                        )}
+
+                        {images.length > 1 && (
+                            <div className="mt-6 flex gap-3 overflow-x-auto max-w-full pb-2">
+                                {images.map((img, i) => (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        onClick={() => setActiveImage(i)}
+                                        className={`flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 transition-all ${activeImage === i ? 'border-white opacity-100' : 'border-white/20 opacity-60 hover:opacity-100'}`}
+                                        aria-label={`View image ${i + 1}`}
+                                    >
+                                        <img src={img} alt="" className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {images.length > 1 && (
+                        <button
+                            type="button"
+                            onClick={() => setActiveImage((i) => (i + 1) % images.length)}
+                            className="absolute right-3 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+                            aria-label="Next image"
+                        >
+                            &rarr;
+                        </button>
+                    )}
                 </div>
             )}
         </div>
