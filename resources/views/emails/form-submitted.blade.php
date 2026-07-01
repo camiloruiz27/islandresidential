@@ -132,7 +132,7 @@
         <div class="header">
             <h1>Island <span>Residential</span></h1>
         </div>
-        
+
         <div class="content">
             <div style="text-align: center;">
                 <div class="badge">New Submission</div>
@@ -140,33 +140,57 @@
             <div class="intro">
                 A new <strong>{{ $formType }}</strong> has been submitted through the website. Here are the details:
             </div>
-            
+
             <table class="data-table">
                 @foreach($formData as $key => $value)
-                    {{-- Ignore file metadata arrays from rendering directly, as they are attached --}}
                     @if(in_array($key, ['photos', 'files', 'created_at', 'updated_at', 'id']))
                         @continue
                     @endif
-                    
+
+                    @if($key === 'apartment_id')
+                        <tr>
+                            <th>Apartment</th>
+                            <td>
+                                @php($propertyTitle = data_get($formData, 'application_data.property_title'))
+                                @if($value && $propertyTitle)
+                                    {{ $value }} - {{ $propertyTitle }}
+                                @elseif($propertyTitle)
+                                    {{ $propertyTitle }}
+                                @else
+                                    {{ $value ?: '-' }}
+                                @endif
+                            </td>
+                        </tr>
+                        @continue
+                    @endif
+
                     <tr>
                         <th>{{ ucwords(str_replace('_', ' ', $key)) }}</th>
                         <td>
                             @if(is_array($value))
                                 <table class="nested-table">
                                     @foreach($value as $subKey => $subValue)
-                                        {{-- Ignore file paths in nested data --}}
-                                        @if(str_contains((string)$subKey, 'path'))
+                                        @if(str_contains((string) $subKey, 'path') || $subKey === 'property_title')
                                             @continue
                                         @endif
                                         <tr>
-                                            <th>{{ ucwords(str_replace('_', ' ', $subKey)) }}</th>
+                                            <th>{{ $subKey === 'property_id' ? 'Property' : ucwords(str_replace('_', ' ', $subKey)) }}</th>
                                             <td>
-                                                @if(is_bool($subValue))
+                                                @if($subKey === 'property_id')
+                                                    @php($nestedPropertyTitle = $value['property_title'] ?? null)
+                                                    @if($subValue && $nestedPropertyTitle)
+                                                        {{ $subValue }} - {{ $nestedPropertyTitle }}
+                                                    @elseif($nestedPropertyTitle)
+                                                        {{ $nestedPropertyTitle }}
+                                                    @else
+                                                        {{ $subValue ?: '-' }}
+                                                    @endif
+                                                @elseif(is_bool($subValue))
                                                     {{ $subValue ? 'Yes' : 'No' }}
                                                 @elseif(is_array($subValue))
                                                     JSON Data
                                                 @else
-                                                    {{ $subValue ?: '—' }}
+                                                    {{ $subValue ?: '-' }}
                                                 @endif
                                             </td>
                                         </tr>
@@ -176,7 +200,7 @@
                                 @if(is_bool($value))
                                     {{ $value ? 'Yes' : 'No' }}
                                 @else
-                                    {!! nl2br(e($value ?: '—')) !!}
+                                    {!! nl2br(e($value ?: '-')) !!}
                                 @endif
                             @endif
                         </td>
@@ -186,12 +210,12 @@
 
             @if((isset($formData['photos']) && count($formData['photos']) > 0) || (isset($formData['files']) && count($formData['files']) > 0))
                 <div class="attachment-notice">
-                    <strong>📎 Attachments Included</strong><br>
+                    <strong>Attachments Included</strong><br>
                     Files uploaded by the user have been securely attached to this email.
                 </div>
             @endif
         </div>
-        
+
         <div class="footer">
             &copy; {{ date('Y') }} Island Residential. This is an automated message.
         </div>

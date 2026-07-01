@@ -1,12 +1,11 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
-import axios from 'axios';
 
 export default function RentalApplication({ apartments = [] }) {
-    const isLocal = typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
-    const { recaptcha } = usePage().props;
+    const { recaptcha, isProduction } = usePage().props;
     const recaptchaSiteKey = recaptcha?.siteKey ?? '';
+    const shouldUseRecaptcha = Boolean(isProduction);
     const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
         applicant_name: '',
         applicant_email: '',
@@ -47,8 +46,6 @@ export default function RentalApplication({ apartments = [] }) {
             why_consider_you: '',
             criminal_offense: '',
             bankruptcy_or_consumer_proposal: '',
-            sin_number: '',
-            declarations_agreed: false,
             terms_agreed: false
         },
         relevant_files: null,
@@ -58,8 +55,98 @@ export default function RentalApplication({ apartments = [] }) {
     });
 
     const [activeTab, setActiveTab] = useState(1);
-    const [draftSaved, setDraftSaved] = useState(false);
-    const [draftSaving, setDraftSaving] = useState(false);
+    const errorEntries = Object.entries(errors || {});
+    const fieldLabels = {
+        applicant_name: 'Applicant Name',
+        applicant_email: 'Email Address',
+        applicant_phone: 'Cell Phone Number',
+        photo_id: 'Photo ID',
+        pet_photo: 'Pet Photo',
+        relevant_files: 'Relevant Files',
+        captcha_token: 'reCAPTCHA',
+        'application_data.property_id': 'Property',
+        'application_data.property_title': 'Property',
+        'application_data.first_name': 'Applicant First Name',
+        'application_data.last_name': 'Last Name',
+        'application_data.current_address': 'Current Address',
+        'application_data.city': 'City',
+        'application_data.state': 'Province',
+        'application_data.date_of_birth': 'Date of Birth',
+        'application_data.occupants_count': 'Total Occupants',
+        'application_data.pets': 'Do You Have Pets?',
+        'application_data.pets_count': 'How many pets?',
+        'application_data.viewed_property': 'Have you already viewed this property?',
+        'application_data.viewing_availability': 'Days and times that work for viewing',
+        'application_data.rented_before': 'Rented before?',
+        'application_data.current_rental_address': 'Current rental address',
+        'application_data.manager_name': 'Manager Name',
+        'application_data.manager_contact': 'Manager Contact',
+        'application_data.rental_length': 'Length of Time',
+        'application_data.reason_for_moving': 'Reason for Moving',
+        'application_data.previous_rental_address': 'Previous rental address',
+        'application_data.previous_manager_name': 'Previous Manager Name',
+        'application_data.previous_manager_contact': 'Previous Manager Contact',
+        'application_data.previous_rental_length': 'Previous Length of Time',
+        'application_data.vehicles': 'Do you have any vehicles?',
+        'application_data.employed': 'Currently Employed?',
+        'application_data.employer_name': 'Employer Name',
+        'application_data.income': 'Income',
+        'application_data.supervisor_name': 'Supervisor Name',
+        'application_data.supervisor_contact': 'Supervisor Contact',
+        'application_data.current_income_source': 'Current source of income',
+        'application_data.why_consider_you': 'Tell us about yourself',
+        'application_data.criminal_offense': 'Criminal Offense',
+        'application_data.bankruptcy_or_consumer_proposal': 'Bankruptcy or consumer proposal',
+        'application_data.terms_agreed': 'Terms and Conditions and Privacy Policy',
+    };
+
+    const formatErrorLabel = (key) => {
+        if (fieldLabels[key]) {
+            return fieldLabels[key];
+        }
+
+        const coApplicantMatch = key.match(/^application_data\.co_applicants\.(\d+)\.(.+)$/);
+
+        if (coApplicantMatch) {
+            const [, index, field] = coApplicantMatch;
+            const coApplicantFieldLabels = {
+                name: 'First Name',
+                last_name: 'Last Name',
+                email: 'Email',
+                address: 'Current Address',
+                date_of_birth: 'Date of Birth',
+                employed: 'Currently Employed?',
+                employer_name: 'Employer Name',
+                income: 'Income',
+                supervisor_name: 'Supervisor Name',
+                supervisor_contact: 'Supervisor Contact',
+                current_income_source: 'Current source of income',
+            };
+
+            return `Co-Applicant #${Number(index) + 1} - ${coApplicantFieldLabels[field] ?? field}`;
+        }
+
+        return key
+            .replace(/^application_data\./, '')
+            .replace(/\.\d+\./g, ' ')
+            .replace(/\./g, ' ')
+            .replace(/_/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    };
+
+    const formatErrorMessage = (key, message) => {
+        const label = formatErrorLabel(key);
+        const normalizedMessage = String(message)
+            .replace(/The application data\.[\w.]+ field is required\./i, 'This question is required.')
+            .replace(/The [\w.]+ field is required when .*?\./i, 'This question is required.')
+            .replace(/The [\w.]+ field is required\./i, 'This question is required.')
+            .replace(/Please share your viewing availability\./i, 'Please enter the days and times that work for your viewing.')
+            .replace(/The co-applicant email must be a valid email address\./i, 'Please enter a valid email address.')
+            .trim();
+
+        return `${label}: ${normalizedMessage}`;
+    };
 
     const handleDataChange = (field, value) => {
         setData('application_data', {
@@ -99,6 +186,57 @@ export default function RentalApplication({ apartments = [] }) {
         }
     }, [data.application_data.occupants_count]);
 
+    useEffect(() => {
+        const errorKeys = Object.keys(errors || {});
+
+        if (errorKeys.length === 0) {
+            return;
+        }
+
+        if (errorKeys.some(key =>
+            key === 'applicant_name' ||
+            key === 'applicant_email' ||
+            key === 'applicant_phone' ||
+            key.startsWith('application_data.property_') ||
+            key.startsWith('application_data.first_name') ||
+            key.startsWith('application_data.last_name') ||
+            key.startsWith('application_data.current_address') ||
+            key.startsWith('application_data.city') ||
+            key.startsWith('application_data.state') ||
+            key.startsWith('application_data.date_of_birth') ||
+            key.startsWith('application_data.occupants_count') ||
+            key.startsWith('application_data.pets') ||
+            key.startsWith('application_data.viewed_property') ||
+            key.startsWith('application_data.viewing_availability')
+        )) {
+            setActiveTab(1);
+            return;
+        }
+
+        if (errorKeys.some(key =>
+            key.startsWith('application_data.rented_before') ||
+            key.startsWith('application_data.current_rental_address') ||
+            key.startsWith('application_data.manager_name') ||
+            key.startsWith('application_data.manager_contact') ||
+            key.startsWith('application_data.rental_length') ||
+            key.startsWith('application_data.reason_for_moving') ||
+            key.startsWith('application_data.previous_') ||
+            key.startsWith('application_data.vehicles') ||
+            key.startsWith('application_data.employed') ||
+            key.startsWith('application_data.employer_name') ||
+            key.startsWith('application_data.income') ||
+            key.startsWith('application_data.supervisor_name') ||
+            key.startsWith('application_data.supervisor_contact') ||
+            key.startsWith('application_data.current_income_source') ||
+            key.startsWith('application_data.co_applicants')
+        )) {
+            setActiveTab(2);
+            return;
+        }
+
+        setActiveTab(3);
+    }, [errors]);
+
     const isTab1Valid = () => {
         const ad = data.application_data;
         if (!data.applicant_email || !data.applicant_phone || !ad.first_name || !ad.last_name || !ad.current_address || !ad.city || !ad.state || !ad.date_of_birth || !ad.occupants_count || !ad.pets || !ad.viewed_property) return false;
@@ -129,24 +267,7 @@ export default function RentalApplication({ apartments = [] }) {
             alert("Please fill all required fields before proceeding.");
             return;
         }
-        
-        // Save draft if not already saved
-        if (!draftSaved && !draftSaving) {
-            setDraftSaving(true);
-            try {
-                await axios.post(route('forms.rental.draft'), {
-                    applicant_name: data.applicant_name,
-                    applicant_email: data.applicant_email,
-                    applicant_phone: data.applicant_phone,
-                    application_data: data.application_data
-                });
-                setDraftSaved(true);
-            } catch (error) {
-                console.error("Failed to save draft:", error);
-            } finally {
-                setDraftSaving(false);
-            }
-        }
+
         setActiveTab(2);
     };
 
@@ -160,7 +281,7 @@ export default function RentalApplication({ apartments = [] }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('forms.rental.store'));
+        post(route('forms.rental.store'), { forceFormData: true });
     };
 
     return (
@@ -196,6 +317,16 @@ export default function RentalApplication({ apartments = [] }) {
                     </div>
                 ) : (
                     <form onSubmit={submit} className="bg-white border border-gray-100 shadow-2xl animate-fade-in-up opacity-0 rounded-[2.5rem] overflow-hidden" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+                        {errorEntries.length > 0 && (
+                            <div className="mx-8 mt-8 rounded-3xl border border-red-200 bg-red-50 px-6 py-5 text-red-800">
+                                <div className="text-sm font-bold uppercase tracking-[0.15em] mb-3">Please review the following</div>
+                                <div className="space-y-2 text-sm">
+                                    {errorEntries.map(([key, message]) => (
+                                        <p key={key}>{formatErrorMessage(key, message)}</p>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                         
                         {/* Tabs Header */}
                         <div className="flex flex-wrap border-b border-gray-100 bg-gray-50/50">
@@ -233,9 +364,14 @@ export default function RentalApplication({ apartments = [] }) {
                                             className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors" 
                                             value={data.application_data.property_id} 
                                             onChange={e => {
-                                                handleDataChange('property_id', e.target.value);
-                                                const selectedApt = apartments.find(a => a.id.toString() === e.target.value);
-                                                handleDataChange('property_title', selectedApt ? selectedApt.title : '');
+                                                const selectedValue = e.target.value;
+                                                const selectedApt = apartments.find(a => String(a.id) === selectedValue);
+
+                                                setData('application_data', {
+                                                    ...data.application_data,
+                                                    property_id: selectedValue,
+                                                    property_title: selectedApt ? selectedApt.title : '',
+                                                });
                                             }} 
                                             required
                                         >
@@ -321,8 +457,8 @@ export default function RentalApplication({ apartments = [] }) {
                                         </div>
                                     )}
                                     <div className="flex justify-end pt-8 border-t border-gray-100">
-                                        <button type="button" onClick={handleNextToTab2} disabled={draftSaving} className="group relative px-10 py-4 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50">
-                                            <span className="relative z-10">{draftSaving ? 'Saving...' : 'Next Step →'}</span>
+                                        <button type="button" onClick={handleNextToTab2} className="group relative px-10 py-4 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50">
+                                            <span className="relative z-10">Next Step →</span>
                                             <div className="absolute inset-0 bg-gray-800 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0 rounded-full"></div>
                                         </button>
                                     </div>
@@ -531,10 +667,6 @@ export default function RentalApplication({ apartments = [] }) {
                                                 <option value="No">No</option>
                                             </select>
                                         </div>
-                                        <div>
-                                            <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">SIN Number (Optional)</label>
-                                            <input type="text" className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors" value={data.application_data.sin_number} onChange={e => handleDataChange('sin_number', e.target.value)} />
-                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold mb-4 uppercase tracking-wider pl-4">Have you ever filed for bankruptcy or consumer proposal? *</label>
@@ -590,7 +722,7 @@ export default function RentalApplication({ apartments = [] }) {
                                         </label>
                                     </div>
 
-                                    {!isLocal && (
+                                    {shouldUseRecaptcha && (
                                         <div className="mt-8 flex flex-col items-center">
                                             {recaptchaSiteKey ? (
                                                 <ReCAPTCHA
@@ -609,7 +741,7 @@ export default function RentalApplication({ apartments = [] }) {
 
                                     <div className="flex justify-between pt-8 border-t border-gray-100">
                                         <button type="button" onClick={() => setActiveTab(2)} className="px-8 py-4 border border-gray-300 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-50 transition-colors">← Back</button>
-                                        <button type="submit" disabled={processing || !data.application_data.terms_agreed || !data.application_data.declarations_agreed || (!isLocal && (!recaptchaSiteKey || !data.captcha_token))} className="group relative px-10 py-4 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50">
+                                        <button type="submit" disabled={processing || !data.application_data.terms_agreed || (shouldUseRecaptcha && (!recaptchaSiteKey || !data.captcha_token))} className="group relative px-10 py-4 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50">
                                             <span className="relative z-10">{processing ? 'Submitting...' : 'Submit Application'}</span>
                                             <div className="absolute inset-0 bg-gray-800 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0 rounded-full"></div>
                                         </button>

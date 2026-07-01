@@ -64,6 +64,17 @@ export default function ApplicationsIndex({ applications, flash }) {
     const [expandedId, setExpandedId] = useState(null);
     const [fileModal, setFileModal] = useState(null); // files array or null
 
+    const formatValue = (value) => {
+        if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+        if (Array.isArray(value) || (value && typeof value === 'object')) {
+            return JSON.stringify(value, null, 2);
+        }
+
+        return String(value || '—');
+    };
+
+    const isComplexValue = (value) => Array.isArray(value) || (value && typeof value === 'object');
+
     const updateStatus = (id, status) => {
         router.patch(route('admin.applications.status', id), { status });
     };
@@ -156,9 +167,15 @@ export default function ApplicationsIndex({ applications, flash }) {
                                                     <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
                                                         {key.replace(/_/g, ' ')}
                                                     </div>
-                                                    <div className="text-sm font-medium text-gray-800">
-                                                        {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value || '—')}
-                                                    </div>
+                                                    {isComplexValue(value) ? (
+                                                        <pre className="text-xs text-gray-800 whitespace-pre-wrap break-words font-mono">
+                                                            {formatValue(value)}
+                                                        </pre>
+                                                    ) : (
+                                                        <div className="text-sm font-medium text-gray-800">
+                                                            {formatValue(value)}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>

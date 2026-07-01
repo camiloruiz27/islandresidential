@@ -2,37 +2,143 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\FormSubmittedNotification;
+use App\Models\Apartment;
 use App\Models\RentalApplication;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use App\Mail\FormSubmittedNotification;
 
 class RentalApplicationController extends Controller
 {
     public function store(Request $request)
     {
-        $rules = [
+        $validator = Validator::make($request->all(), [
             'applicant_name' => 'required|string|max:255',
             'applicant_email' => 'required|email|max:255',
             'applicant_phone' => 'required|string|max:20',
             'application_data' => 'required|array',
+            'application_data.property_id' => [
+                'required',
+                'integer',
+                Rule::exists('apartments', 'id')->where(fn ($query) => $query->where('status', 'available')),
+            ],
+            'application_data.property_title' => 'required|string|max:255',
+            'application_data.first_name' => 'required|string|max:255',
+            'application_data.last_name' => 'required|string|max:255',
+            'application_data.current_address' => 'required|string|max:255',
+            'application_data.city' => 'required|string|max:255',
+            'application_data.state' => 'required|string|max:255',
+            'application_data.date_of_birth' => 'required|date',
+            'application_data.occupants_count' => 'required|integer|min:1',
+            'application_data.pets' => ['required', Rule::in(['Yes', 'No'])],
+            'application_data.pets_count' => 'nullable|integer|min:1',
+            'application_data.viewed_property' => ['required', Rule::in(['Yes', 'No'])],
+            'application_data.viewing_availability' => 'nullable|string',
+            'application_data.rented_before' => ['required', Rule::in(['Yes', 'No'])],
+            'application_data.current_rental_address' => 'nullable|string|max:255',
+            'application_data.manager_name' => 'nullable|string|max:255',
+            'application_data.manager_contact' => 'nullable|string|max:255',
+            'application_data.rental_length' => 'nullable|string|max:255',
+            'application_data.reason_for_moving' => 'nullable|string|max:500',
+            'application_data.previous_rental_address' => 'nullable|string|max:255',
+            'application_data.previous_manager_name' => 'nullable|string|max:255',
+            'application_data.previous_manager_contact' => 'nullable|string|max:255',
+            'application_data.previous_rental_length' => 'nullable|string|max:255',
+            'application_data.vehicles' => 'nullable|string|max:255',
+            'application_data.employed' => ['required', Rule::in(['Yes', 'No'])],
+            'application_data.employer_name' => 'nullable|string|max:255',
+            'application_data.income' => 'nullable|string|max:255',
+            'application_data.supervisor_name' => 'nullable|string|max:255',
+            'application_data.supervisor_contact' => 'nullable|string|max:255',
+            'application_data.current_income_source' => 'nullable|string|max:1000',
+            'application_data.co_applicants' => 'nullable|array',
+            'application_data.why_consider_you' => 'required|string|max:2000',
+            'application_data.criminal_offense' => ['required', Rule::in(['Yes', 'No'])],
+            'application_data.bankruptcy_or_consumer_proposal' => ['required', Rule::in(['Yes', 'No'])],
+            'application_data.terms_agreed' => 'accepted',
             'photo_id' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'relevant_files.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'pet_photo' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
-        ];
+        ]);
 
-        if (!app()->environment('local')) {
-            $rules['captcha_token'] = 'required|string';
+        if (app()->environment('production')) {
+            $validator->addRules([
+                'captcha_token' => 'required|string',
+            ]);
         }
 
-        $request->validate($rules);
+        $validator->after(function ($validator) use ($request) {
+            $appData = (array) $request->input('application_data', []);
+
+            if (($appData['pets'] ?? null) === 'Yes') {
+                if (blank($appData['pets_count'] ?? null)) {
+                    $validator->errors()->add('application_data.pets_count', 'The pets count field is required when pets is Yes.');
+                }
+
+                if (!$request->hasFile('pet_photo')) {
+                    $validator->errors()->add('pet_photo', 'The pet photo field is required when pets is Yes.');
+                }
+            }
+
+            if (($appData['viewed_property'] ?? null) === 'No' && blank($appData['viewing_availability'] ?? null)) {
+                $validator->errors()->add('application_data.viewing_availability', 'Please share your viewing availability.');
+            }
+
+            if (($appData['rented_before'] ?? null) === 'Yes') {
+                foreach (['current_rental_address', 'manager_name', 'manager_contact', 'rental_length', 'reason_for_moving'] as $field) {
+                    if (blank($appData[$field] ?? null)) {
+                        $validator->errors()->add("application_data.{$field}", "The {$field} field is required when rented before is Yes.");
+                    }
+                }
+            }
+
+            if (($appData['employed'] ?? null) === 'Yes') {
+                foreach (['employer_name', 'income', 'supervisor_name', 'supervisor_contact'] as $field) {
+                    if (blank($appData[$field] ?? null)) {
+                        $validator->errors()->add("application_data.{$field}", "The {$field} field is required when employed is Yes.");
+                    }
+                }
+            }
+
+            if (($appData['employed'] ?? null) === 'No' && blank($appData['current_income_source'] ?? null)) {
+                $validator->errors()->add('application_data.current_income_source', 'The current income source field is required when employed is No.');
+            }
+
+            foreach ((array) ($appData['co_applicants'] ?? []) as $index => $coApplicant) {
+                foreach (['name', 'last_name', 'email', 'employed'] as $field) {
+                    if (blank($coApplicant[$field] ?? null)) {
+                        $validator->errors()->add("application_data.co_applicants.{$index}.{$field}", "The co-applicant {$field} field is required.");
+                    }
+                }
+
+                if (!blank($coApplicant['email'] ?? null) && !filter_var($coApplicant['email'], FILTER_VALIDATE_EMAIL)) {
+                    $validator->errors()->add("application_data.co_applicants.{$index}.email", 'The co-applicant email must be a valid email address.');
+                }
+
+                if (($coApplicant['employed'] ?? null) === 'Yes') {
+                    foreach (['employer_name', 'income', 'supervisor_name', 'supervisor_contact'] as $field) {
+                        if (blank($coApplicant[$field] ?? null)) {
+                            $validator->errors()->add("application_data.co_applicants.{$index}.{$field}", "The co-applicant {$field} field is required when employed is Yes.");
+                        }
+                    }
+                }
+
+                if (($coApplicant['employed'] ?? null) === 'No' && blank($coApplicant['current_income_source'] ?? null)) {
+                    $validator->errors()->add("application_data.co_applicants.{$index}.current_income_source", 'The co-applicant current income source field is required when employed is No.');
+                }
+            }
+        });
+
+        $validated = $validator->validate();
 
         // Verify reCAPTCHA
-        if (!app()->environment('local')) {
+        if (app()->environment('production')) {
             $secret = config('services.recaptcha.secret_key');
 
             if (blank($secret)) {
@@ -43,8 +149,8 @@ class RentalApplicationController extends Controller
 
             $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
                 'secret' => $secret,
-                'response' => $request->captcha_token,
-                'remoteip' => $request->ip()
+                'response' => $validated['captcha_token'],
+                'remoteip' => $request->ip(),
             ]);
 
             if (!$response->json('success')) {
@@ -52,7 +158,8 @@ class RentalApplicationController extends Controller
             }
         }
 
-        $appData = $request->application_data;
+        $appData = $validated['application_data'];
+        $apartment = Apartment::findOrFail($appData['property_id']);
         $allFiles = []; // Collect all uploaded file paths for admin viewing
 
         // Store photo ID in private storage (sensitive document)
@@ -80,6 +187,7 @@ class RentalApplicationController extends Controller
 
         // Create Application
         $application = RentalApplication::create([
+            'apartment_id'    => $apartment->id,
             'applicant_name'  => $request->applicant_name,
             'applicant_email' => $request->applicant_email,
             'applicant_phone' => $request->applicant_phone,
@@ -92,36 +200,6 @@ class RentalApplicationController extends Controller
         Mail::to($rentalEmail)->send(new FormSubmittedNotification($application->toArray(), 'Rental Application'));
 
         return back()->with('success', 'Application submitted successfully.');
-    }
-
-    public function storeDraft(Request $request)
-    {
-        $rules = [
-            'applicant_name' => 'required|string|max:255',
-            'applicant_email' => 'required|email|max:255',
-            'applicant_phone' => 'required|string|max:20',
-            'application_data' => 'required|array',
-        ];
-
-        $request->validate($rules);
-
-        $appData = $request->application_data;
-
-        // Create Draft Application
-        $application = RentalApplication::create([
-            'applicant_name'  => $request->applicant_name,
-            'applicant_email' => $request->applicant_email,
-            'applicant_phone' => $request->applicant_phone,
-            'application_data' => $appData,
-            'files'           => [],
-            'status'          => 'draft'
-        ]);
-
-        // Send Email for the draft
-        $rentalEmail = Setting::get('rental_email', 'info@islandresidential.ca');
-        Mail::to($rentalEmail)->send(new FormSubmittedNotification($application->toArray(), 'Rental Application (Partial/Draft)'));
-
-        return response()->json(['success' => true]);
     }
 
     /**

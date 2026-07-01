@@ -42,7 +42,7 @@ class HandleInertiaRequests extends Middleware
                     'location' => $request->url(),
                 ]);
             },
-            'isProduction' => !app()->environment('local'),
+            'isProduction' => app()->environment('production'),
             'recaptcha' => [
                 'siteKey' => config('services.recaptcha.site_key'),
             ],

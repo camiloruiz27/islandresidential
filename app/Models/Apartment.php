@@ -24,15 +24,20 @@ class Apartment extends Model
     {
         $this->images = collect($this->images ?? [])
             ->filter()
-            ->map(function (string $image): string {
+            ->map(function (string $image): ?string {
                 $normalized = $this->normalizeImagePath($image);
 
                 if ($normalized === null) {
                     return $image;
                 }
 
+                if (!Storage::disk('public')->exists($normalized)) {
+                    return null;
+                }
+
                 return route('public.apartment-image', ['path' => $normalized]);
             })
+            ->filter()
             ->values()
             ->all();
 

@@ -89,8 +89,6 @@ Route::get('/forms/rental', function () {
     ]);
 })->name('forms.rental');
 
-Route::post('/forms/rental/draft', [\App\Http\Controllers\RentalApplicationController::class, 'storeDraft'])->name('forms.rental.draft');
-
 Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/privacy-policy', function () {
