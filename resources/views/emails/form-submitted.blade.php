@@ -185,6 +185,14 @@
                                                     @else
                                                         {{ $subValue ?: '-' }}
                                                     @endif
+                                                @elseif($subKey === 'terms_agreed')
+                                                    @if($subValue)
+                                                        <strong>The applicant accepted the Terms and Conditions and Privacy Policy.</strong>
+                                                        <br><br>
+                                                        By checking this box, I (we), the Applicant(s), explicitly authorize and consent to the Landlord or their agent obtaining and viewing credit, financial, and related personal or business information, as well as tenancy history about the Applicant (including credit reports, credit scores, and tenant records) from past and present Landlords and from credit reporting agencies (such as Equifax, TransUnion, and the Landlord Credit Bureau) from time to time for the purposes of assessing the Applicant's current and ongoing eligibility for tenancy. The Applicant(s) grant permission to contact the references listed in this application, both now and in the future, for rental consideration. The Applicant(s) acknowledge and understand that personal information will be collected, processed, and stored in accordance with the Terms and Conditions and Privacy Policy for now and future rental applications or for collections purposes should they be deemed necessary. The consents provided are effective as of the date of this Application and will remain valid for as long as required to fulfill the purposes described herein.
+                                                    @else
+                                                        The applicant did not accept the Terms and Conditions and Privacy Policy.
+                                                    @endif
                                                 @elseif(is_bool($subValue))
                                                     {{ $subValue ? 'Yes' : 'No' }}
                                                 @elseif(is_array($subValue))
