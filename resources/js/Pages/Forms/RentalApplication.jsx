@@ -2,7 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
-export default function RentalApplication({ apartments = [] }) {
+export default function RentalApplication() {
     const { recaptcha, isProduction } = usePage().props;
     const recaptchaSiteKey = recaptcha?.siteKey ?? '';
     const shouldUseRecaptcha = Boolean(isProduction);
@@ -360,26 +360,14 @@ export default function RentalApplication({ apartments = [] }) {
                                 <div className="space-y-8 animate-fade-in-up">
                                     <div>
                                         <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">Property *</label>
-                                        <select 
-                                            className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors" 
-                                            value={data.application_data.property_id} 
-                                            onChange={e => {
-                                                const selectedValue = e.target.value;
-                                                const selectedApt = apartments.find(a => String(a.id) === selectedValue);
-
-                                                setData('application_data', {
-                                                    ...data.application_data,
-                                                    property_id: selectedValue,
-                                                    property_title: selectedApt ? selectedApt.title : '',
-                                                });
-                                            }} 
+                                        <input
+                                            type="text"
+                                            className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                                            value={data.application_data.property_title}
+                                            onChange={e => handleDataChange('property_title', e.target.value)}
+                                            placeholder="Enter property name"
                                             required
-                                        >
-                                            <option value="">Please Select a Property</option>
-                                            {apartments.map(apt => (
-                                                <option key={apt.id} value={apt.id}>{apt.title} - {apt.location}</option>
-                                            ))}
-                                        </select>
+                                        />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div>

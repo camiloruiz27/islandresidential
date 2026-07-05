@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Mail\FormSubmittedNotification;
-use App\Models\Apartment;
 use App\Models\RentalApplication;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -24,7 +23,7 @@ class RentalApplicationController extends Controller
             'applicant_phone' => 'required|string|max:20',
             'application_data' => 'required|array',
             'application_data.property_id' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists('apartments', 'id')->where(fn ($query) => $query->where('status', 'available')),
             ],
@@ -159,7 +158,6 @@ class RentalApplicationController extends Controller
         }
 
         $appData = $validated['application_data'];
-        $apartment = Apartment::findOrFail($appData['property_id']);
         $allFiles = []; // Collect all uploaded file paths for admin viewing
 
         // Store photo ID in private storage (sensitive document)
@@ -187,7 +185,7 @@ class RentalApplicationController extends Controller
 
         // Create Application
         $application = RentalApplication::create([
-            'apartment_id'    => $apartment->id,
+            'apartment_id'    => $appData['property_id'] ?? null,
             'applicant_name'  => $request->applicant_name,
             'applicant_email' => $request->applicant_email,
             'applicant_phone' => $request->applicant_phone,
