@@ -53,6 +53,49 @@ class RentalApplicationTest extends TestCase
         Mail::assertSent(FormSubmittedNotification::class);
     }
 
+    public function test_rental_application_accepts_property_title_without_property_id(): void
+    {
+        Mail::fake();
+        Http::fake();
+
+        Setting::updateOrCreate(
+            ['key' => 'rental_email'],
+            ['value' => 'rentals@example.com', 'label' => 'Rental Email']
+        );
+
+        $apartment = Apartment::create([
+            'title' => 'Unit Text Input',
+            'description' => 'Nice apartment',
+            'location' => 'Sydney',
+            'price' => 1200,
+            'bedrooms' => 2,
+            'bathrooms' => 1,
+            'images' => [],
+            'status' => 'available',
+            'has_parking' => true,
+        ]);
+
+        $payload = $this->validPayload($apartment, [
+            'application_data' => [
+                'property_id' => null,
+                'property_title' => 'Manual Property Name',
+            ],
+        ]);
+
+        $response = $this->post(route('forms.rental.store'), $payload);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertSessionHas('success');
+
+        $application = RentalApplication::first();
+
+        $this->assertNotNull($application);
+        $this->assertNull($application->apartment_id);
+        $this->assertSame('Manual Property Name', $application->application_data['property_title']);
+
+        Mail::assertSent(FormSubmittedNotification::class);
+    }
+
     public function test_rental_application_requires_conditional_fields(): void
     {
         Mail::fake();
