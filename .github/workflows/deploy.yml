@@ -39,7 +39,7 @@ jobs:
           npm run build
           test -f public/build/manifest.json
 
-      - name: Ensure remote build dir exists
+      - name: Ensure remote app dir exists
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -47,18 +47,17 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 65002
           script: |
-            mkdir -p /home/u206029413/domains/islandresidential.ca/public_html/public/build
+            mkdir -p /home/u206029413/domains/islandresidential.ca/public_html
 
-      - name: Upload Vite build to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 65002
-          source: "public/build/*"
-          target: "/home/u206029413/domains/islandresidential.ca/public_html/public/build"
-          strip_components: 2
+      - name: Deploy application to server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+          REMOTE_PORT: ${{ secrets.SSH_PORT }}
+          TARGET: "/home/u206029413/domains/islandresidential.ca/public_html"
+          EXCLUDE: "/.git/, /.github/, /node_modules/, /tests/, /storage/, /public/storage/, /.env, /.env.*, /README.md"
           
       - name: Clear Laravel caches
         uses: appleboy/ssh-action@v1.0.3
