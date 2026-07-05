@@ -55,5 +55,5 @@ jobs:
           REMOTE_HOST: ${{ secrets.SSH_HOST }}
           REMOTE_USER: ${{ secrets.SSH_USERNAME }}
           REMOTE_PORT: ${{ secrets.SSH_PORT }}
-          TARGET: ${{ secrets.SSH_TARGET_DIR }} # Ejemplo: public_html/ o dominios/midominio.com/public_html/
+          TARGET: "/home/u206029413/domains/islandresidential.ca/public_html/public/build"
           EXCLUDE: "/.git/, /node_modules/, /tests/, /.env.example, /README.md"
