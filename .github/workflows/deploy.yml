@@ -39,25 +39,26 @@ jobs:
           npm run build
           test -f public/build/manifest.json
 
-      - name: Setup SSH Key
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Ensure remote build dir exists
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 65002
+          script: |
+            mkdir -p /home/u206029413/domains/islandresidential.ca/public_html/public/build
 
-      - name: Add Host to Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to Hostinger via SSH/Rsync
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.SSH_HOST }}
-          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
-          REMOTE_PORT: ${{ secrets.SSH_PORT }}
-          TARGET: "/home/u206029413/domains/islandresidential.ca/public_html/public/build"
-          EXCLUDE: "/.git/, /node_modules/, /tests/, /.env.example, /README.md"
+      - name: Upload Vite build to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 65002
+          source: "public/build/*"
+          target: "/home/u206029413/domains/islandresidential.ca/public_html/public/build"
+          strip_components: 2
           
       - name: Clear Laravel caches
         uses: appleboy/ssh-action@v1.0.3
