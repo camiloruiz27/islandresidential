@@ -239,7 +239,7 @@ export default function RentalApplication() {
 
     const isTab1Valid = () => {
         const ad = data.application_data;
-        if (!data.applicant_email || !data.applicant_phone || !ad.first_name || !ad.last_name || !ad.current_address || !ad.city || !ad.state || !ad.date_of_birth || !ad.occupants_count || !ad.pets || !ad.viewed_property) return false;
+        if (!ad.property_title || !data.applicant_email || !data.applicant_phone || !ad.first_name || !ad.last_name || !ad.current_address || !ad.city || !ad.state || !ad.date_of_birth || !ad.occupants_count || !ad.pets || !ad.viewed_property) return false;
         if (ad.pets === 'Yes' && !ad.pets_count) return false;
         if (ad.viewed_property === 'No' && !ad.viewing_availability) return false;
         return true;
