@@ -84,9 +84,7 @@ Route::get('/properties/{apartment}', function (\App\Models\Apartment $apartment
 })->name('properties.show');
 
 Route::get('/forms/rental', function () {
-    return Inertia::render('Forms/RentalApplication', [
-        'apartments' => \App\Models\Apartment::where('status', 'available')->get()
-    ]);
+    return Inertia::render('Forms/RentalApplication');
 })->name('forms.rental');
 
 Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
