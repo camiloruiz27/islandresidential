@@ -16,12 +16,36 @@ const StatCard = ({ label, value, sub, icon, color }) => (
 );
 
 function SettingsWidget({ settings }) {
+    const normalizeEmails = (emails = ['']) => {
+        const values = Array.isArray(emails) ? emails.filter(email => typeof email === 'string') : [];
+        return values.length > 0 ? values : [''];
+    };
+
     const { data, setData, post, processing, errors } = useForm({
-        maintenance_email: settings?.maintenance_email ?? '',
-        rental_email:      settings?.rental_email      ?? '',
+        maintenance_emails: normalizeEmails(settings?.maintenance_emails),
+        rental_emails: normalizeEmails(settings?.rental_emails),
     });
 
     const [saved, setSaved] = useState(false);
+
+    const updateEmail = (field, index, value) => {
+        setData(field, data[field].map((email, currentIndex) => (
+            currentIndex === index ? value : email
+        )));
+    };
+
+    const addEmail = (field) => {
+        if (data[field].length >= 4) {
+            return;
+        }
+
+        setData(field, [...data[field], '']);
+    };
+
+    const removeEmail = (field, index) => {
+        const nextValues = data[field].filter((_, currentIndex) => currentIndex !== index);
+        setData(field, nextValues.length > 0 ? nextValues : ['']);
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -50,42 +74,108 @@ function SettingsWidget({ settings }) {
                     </div>
                 )}
 
-                <div>
-                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 pl-1">
-                        Maintenance Request Email
-                    </label>
-                    <p className="text-xs text-gray-400 mb-3 pl-1">Notifications from the maintenance form will be sent here</p>
-                    <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
-                        <input
-                            type="email"
-                            className={`w-full pl-8 pr-4 py-3.5 rounded-xl border bg-gray-50 text-sm focus:outline-none focus:border-black focus:bg-white transition-colors ${errors.maintenance_email ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
-                            value={data.maintenance_email}
-                            onChange={e => setData('maintenance_email', e.target.value)}
-                            placeholder="rent@islandresidential.ca"
-                            required
-                        />
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 pl-1">
+                                Maintenance Request Emails
+                            </label>
+                            <p className="text-xs text-gray-400 pl-1">Notifications from the maintenance form will be sent to these recipients</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => addEmail('maintenance_emails')}
+                            disabled={data.maintenance_emails.length >= 4}
+                            className="px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Add Email
+                        </button>
                     </div>
-                    {errors.maintenance_email && <p className="text-red-500 text-xs mt-1.5 pl-1">{errors.maintenance_email}</p>}
+                    <div className="text-[11px] uppercase tracking-widest text-gray-300 pl-1">{data.maintenance_emails.length}/4 recipients</div>
+                    <div className="space-y-3">
+                        {data.maintenance_emails.map((email, index) => (
+                            <div key={`maintenance-${index}`}>
+                                <div className="flex items-center gap-2">
+                                    <div className="relative flex-1">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
+                                        <input
+                                            type="email"
+                                            className={`w-full pl-8 pr-4 py-3.5 rounded-xl border bg-gray-50 text-sm focus:outline-none focus:border-black focus:bg-white transition-colors ${errors[`maintenance_emails.${index}`] || errors.maintenance_emails ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+                                            value={email}
+                                            onChange={e => updateEmail('maintenance_emails', index, e.target.value)}
+                                            placeholder="rent@islandresidential.ca"
+                                            required={index === 0}
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeEmail('maintenance_emails', index)}
+                                        disabled={data.maintenance_emails.length === 1}
+                                        className="px-3 py-3 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                                {(errors[`maintenance_emails.${index}`] || (index === 0 && errors.maintenance_emails)) && (
+                                    <p className="text-red-500 text-xs mt-1.5 pl-1">
+                                        {errors[`maintenance_emails.${index}`] ?? errors.maintenance_emails}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 pl-1">
-                        Rental Application Email
-                    </label>
-                    <p className="text-xs text-gray-400 mb-3 pl-1">Rental application submissions will go to this address</p>
-                    <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
-                        <input
-                            type="email"
-                            className={`w-full pl-8 pr-4 py-3.5 rounded-xl border bg-gray-50 text-sm focus:outline-none focus:border-black focus:bg-white transition-colors ${errors.rental_email ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
-                            value={data.rental_email}
-                            onChange={e => setData('rental_email', e.target.value)}
-                            placeholder="rentals@example.com"
-                            required
-                        />
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 pl-1">
+                                Rental Application Emails
+                            </label>
+                            <p className="text-xs text-gray-400 pl-1">Rental application submissions will go to these recipients</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => addEmail('rental_emails')}
+                            disabled={data.rental_emails.length >= 4}
+                            className="px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Add Email
+                        </button>
                     </div>
-                    {errors.rental_email && <p className="text-red-500 text-xs mt-1.5 pl-1">{errors.rental_email}</p>}
+                    <div className="text-[11px] uppercase tracking-widest text-gray-300 pl-1">{data.rental_emails.length}/4 recipients</div>
+                    <div className="space-y-3">
+                        {data.rental_emails.map((email, index) => (
+                            <div key={`rental-${index}`}>
+                                <div className="flex items-center gap-2">
+                                    <div className="relative flex-1">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
+                                        <input
+                                            type="email"
+                                            className={`w-full pl-8 pr-4 py-3.5 rounded-xl border bg-gray-50 text-sm focus:outline-none focus:border-black focus:bg-white transition-colors ${errors[`rental_emails.${index}`] || errors.rental_emails ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+                                            value={email}
+                                            onChange={e => updateEmail('rental_emails', index, e.target.value)}
+                                            placeholder="rentals@example.com"
+                                            required={index === 0}
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeEmail('rental_emails', index)}
+                                        disabled={data.rental_emails.length === 1}
+                                        className="px-3 py-3 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                                {(errors[`rental_emails.${index}`] || (index === 0 && errors.rental_emails)) && (
+                                    <p className="text-red-500 text-xs mt-1.5 pl-1">
+                                        {errors[`rental_emails.${index}`] ?? errors.rental_emails}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="pt-2">

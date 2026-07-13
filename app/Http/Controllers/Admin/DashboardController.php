@@ -23,8 +23,8 @@ class DashboardController extends Controller
         $recentMaintenance  = MaintenanceRequest::latest()->take(5)->get();
 
         $settings = [
-            'maintenance_email' => Setting::get('maintenance_email', 'rent@islandresidential.ca'),
-            'rental_email'      => Setting::get('rental_email', 'info@islandresidential.ca'),
+            'maintenance_emails' => Setting::getEmailList('maintenance_email', ['rent@islandresidential.ca']),
+            'rental_emails'      => Setting::getEmailList('rental_email', ['info@islandresidential.ca']),
         ];
 
         return \Inertia\Inertia::render('Admin/Dashboard', [

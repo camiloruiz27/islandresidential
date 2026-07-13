@@ -194,8 +194,8 @@ class RentalApplicationController extends Controller
         ]);
 
         // Send Email
-        $rentalEmail = Setting::get('rental_email', 'info@islandresidential.ca');
-        Mail::to($rentalEmail)->send(new FormSubmittedNotification($application->toArray(), 'Rental Application'));
+        $rentalEmails = Setting::getEmailList('rental_email', ['info@islandresidential.ca']);
+        Mail::to($rentalEmails)->send(new FormSubmittedNotification($application->toArray(), 'Rental Application'));
 
         return back()->with('success', 'Application submitted successfully.');
     }
