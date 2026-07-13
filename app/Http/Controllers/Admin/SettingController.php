@@ -10,13 +10,20 @@ class SettingController extends Controller
 {
     public function update(Request $request)
     {
-        $request->validate([
-            'maintenance_email' => 'required|email|max:255',
-            'rental_email'      => 'required|email|max:255',
-        ]);
+        $input = [
+            'maintenance_emails' => Setting::normalizeEmailList($request->input('maintenance_emails', [])),
+            'rental_emails'      => Setting::normalizeEmailList($request->input('rental_emails', [])),
+        ];
 
-        Setting::set('maintenance_email', $request->maintenance_email);
-        Setting::set('rental_email',      $request->rental_email);
+        validator($input, [
+            'maintenance_emails'   => ['required', 'array', 'min:1', 'max:4'],
+            'maintenance_emails.*' => ['required', 'email', 'max:255'],
+            'rental_emails'        => ['required', 'array', 'min:1', 'max:4'],
+            'rental_emails.*'      => ['required', 'email', 'max:255'],
+        ])->validate();
+
+        Setting::setEmailList('maintenance_email', $input['maintenance_emails']);
+        Setting::setEmailList('rental_email', $input['rental_emails']);
 
         return back()->with('success', 'Settings saved successfully.');
     }

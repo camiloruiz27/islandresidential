@@ -77,8 +77,8 @@ class MaintenanceRequestController extends Controller
         ]);
 
         // Send Email
-        $maintenanceEmail = Setting::get('maintenance_email', 'rent@islandresidential.ca');
-        Mail::to($maintenanceEmail)->send(new FormSubmittedNotification($maintenanceRequest->toArray(), 'Maintenance Request'));
+        $maintenanceEmails = Setting::getEmailList('maintenance_email', ['rent@islandresidential.ca']);
+        Mail::to($maintenanceEmails)->send(new FormSubmittedNotification($maintenanceRequest->toArray(), 'Maintenance Request'));
 
         return redirect()
             ->route('forms.maintenance')
