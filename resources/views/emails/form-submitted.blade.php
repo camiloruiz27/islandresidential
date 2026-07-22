@@ -143,7 +143,7 @@
 
             <table class="data-table">
                 @foreach($formData as $key => $value)
-                    @if(in_array($key, ['photos', 'files', 'created_at', 'updated_at', 'id']))
+                    @if(in_array($key, ['photos', 'files', 'priority', 'created_at', 'updated_at', 'id']))
                         @continue
                     @endif
 

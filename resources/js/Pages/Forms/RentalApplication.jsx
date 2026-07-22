@@ -6,7 +6,7 @@ export default function RentalApplication() {
     const { recaptcha, isProduction } = usePage().props;
     const recaptchaSiteKey = recaptcha?.siteKey ?? '';
     const shouldUseRecaptcha = Boolean(isProduction);
-    const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
+    const { data, setData, post, processing, errors, wasSuccessful } = useForm({
         applicant_name: '',
         applicant_email: '',
         applicant_phone: '',
@@ -309,11 +309,11 @@ export default function RentalApplication() {
                     <p className="text-lg text-brand-gray font-light">Please fill out the details below to apply for a property. All fields marked with * are required.</p>
                 </div>
 
-                {recentlySuccessful ? (
+                {wasSuccessful ? (
                     <div className="bg-green-50 border border-green-200 text-green-800 p-10 shadow-sm animate-scale-up rounded-3xl">
                         <h3 className="font-bold text-2xl mb-4 tracking-tight">Application Submitted Successfully!</h3>
                         <p className="font-light text-lg mb-8">Thank you for applying. Our team will review your application and contact you soon.</p>
-                        <button onClick={() => window.location.reload()} className="text-sm font-bold tracking-[0.2em] uppercase border-b-2 border-green-800 pb-1 hover:text-green-600 hover:border-green-600 transition-colors">Submit another</button>
+                        <Link href={route('properties.index')} className="text-sm font-bold tracking-[0.2em] uppercase border-b-2 border-green-800 pb-1 hover:text-green-600 hover:border-green-600 transition-colors">View Apartments</Link>
                     </div>
                 ) : (
                     <form onSubmit={submit} className="bg-white border border-gray-100 shadow-2xl animate-fade-in-up opacity-0 rounded-[2.5rem] overflow-hidden" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
