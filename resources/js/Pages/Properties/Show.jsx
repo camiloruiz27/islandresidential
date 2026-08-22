@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import SeoHead, { SITE_NAME, SITE_URL, absoluteUrl } from '@/Components/SeoHead';
 
 export default function Show({ apartment }) {
     const [scrolled, setScrolled] = useState(false);
@@ -14,6 +15,72 @@ export default function Show({ apartment }) {
     }, []);
 
     const images = apartment.images && apartment.images.length > 0 ? apartment.images : [];
+    const location = apartment.location || 'Nova Scotia, Canada';
+    const description = `${apartment.title} is an available ${apartment.bedrooms} bedroom, ${apartment.bathrooms} bathroom apartment for rent in ${location}. Contact Island Residential to book a viewing.`;
+    const primaryImage = images[0] || '/images/island-residential-apartments-cape-breton-coastal-view.jpg';
+    const structuredData = [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'Apartment',
+            name: apartment.title,
+            description: apartment.description || description,
+            image: images.map((image) => absoluteUrl(image)),
+            url: `${SITE_URL}/properties/${apartment.id}`,
+            address: {
+                '@type': 'PostalAddress',
+                addressLocality: location,
+                addressRegion: 'NS',
+                addressCountry: 'CA',
+            },
+            numberOfRooms: apartment.bedrooms,
+            numberOfBathroomsTotal: apartment.bathrooms,
+            petsAllowed: 'By approval',
+            amenityFeature: [
+                {
+                    '@type': 'LocationFeatureSpecification',
+                    name: 'Parking',
+                    value: Boolean(apartment.has_parking),
+                },
+            ],
+            offers: {
+                '@type': 'Offer',
+                price: apartment.price,
+                priceCurrency: 'CAD',
+                availability: apartment.status === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                url: `${SITE_URL}/properties/${apartment.id}`,
+                seller: {
+                    '@type': ['LocalBusiness', 'RealEstateAgent'],
+                    name: SITE_NAME,
+                    url: SITE_URL,
+                    email: 'rent@islandresidential.ca',
+                },
+            },
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'Home',
+                    item: SITE_URL,
+                },
+                {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: 'Available Apartments',
+                    item: `${SITE_URL}/properties`,
+                },
+                {
+                    '@type': 'ListItem',
+                    position: 3,
+                    name: apartment.title,
+                    item: `${SITE_URL}/properties/${apartment.id}`,
+                },
+            ],
+        },
+    ];
 
     useEffect(() => {
         if (!showImageModal) {
@@ -40,7 +107,14 @@ export default function Show({ apartment }) {
 
     return (
         <div className="min-h-screen bg-brand-white text-brand-black font-sans selection:bg-brand-black selection:text-brand-white">
-            <Head title={`${apartment.title} - Island Residential`} />
+            <SeoHead
+                title={`${apartment.title} for Rent in ${location}`}
+                description={description}
+                path={`/properties/${apartment.id}`}
+                image={primaryImage}
+                type="product"
+                structuredData={structuredData}
+            />
 
             {/* Navbar */}
             <nav className={`fixed w-full z-50 transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>

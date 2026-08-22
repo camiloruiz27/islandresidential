@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import SeoHead from '@/Components/SeoHead';
 
 export default function PrivacyPolicy() {
     const [scrolled, setScrolled] = useState(false);
@@ -14,7 +15,12 @@ export default function PrivacyPolicy() {
 
     return (
         <div className="min-h-screen bg-brand-white text-brand-black font-sans selection:bg-brand-black selection:text-brand-white">
-            <Head title="Privacy Policy - Island Residential" />
+            <SeoHead
+                title="Privacy Policy | Island Residential"
+                description="Privacy and data handling policy for Island Residential rental applications and tenant communications."
+                path="/privacy-policy"
+                robots="noindex, follow"
+            />
 
             {/* Navbar */}
             <nav className={`fixed w-full z-50 transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>

@@ -23,7 +23,9 @@ export default function Index({ apartments, flash }) {
 
     return (
         <AdminLayout title="Apartments">
-            <Head title="Apartments - Admin" />
+            <Head title="Apartments | Admin">
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             <div className="flex items-center justify-between mb-8">
                 <div>

@@ -111,7 +111,9 @@ export default function MaintenanceIndex({ requests, flash }) {
 
     return (
         <AdminLayout title="Maintenance Requests">
-            <Head title="Maintenance - Admin" />
+            <Head title="Maintenance | Admin">
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             {/* Photo Modal */}
             {photoModal && <PhotoModal photos={photoModal} onClose={() => setPhotoModal(null)} />}

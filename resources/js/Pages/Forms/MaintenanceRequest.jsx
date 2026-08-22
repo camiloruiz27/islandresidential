@@ -1,5 +1,6 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import ReCAPTCHA from 'react-google-recaptcha';
+import SeoHead from '@/Components/SeoHead';
 
 export default function MaintenanceRequest() {
     const isLocal = typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
@@ -28,7 +29,12 @@ export default function MaintenanceRequest() {
 
     return (
         <div className="min-h-screen bg-brand-white text-brand-black font-sans selection:bg-brand-black selection:text-brand-white">
-            <Head title="Maintenance Request - Island Residential" />
+            <SeoHead
+                title="Maintenance Request | Island Residential"
+                description="Current Island Residential tenants can submit maintenance requests online."
+                path="/forms/maintenance"
+                robots="noindex, follow"
+            />
 
             <nav className="border-b border-gray-200 py-8 bg-brand-white">
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center">

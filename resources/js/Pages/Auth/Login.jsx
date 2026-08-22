@@ -32,7 +32,9 @@ export default function Login({ status }) {
 
     return (
         <div className="min-h-screen bg-brand-white text-brand-black font-sans flex">
-            <Head title="Admin Login - Island Residential" />
+            <Head title="Admin Login | Island Residential">
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             {/* Left side: Image and Branding */}
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-brand-black items-center justify-center">

@@ -1,21 +1,93 @@
-import { Link, Head, useForm } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
+import SeoHead, { DEFAULT_IMAGE, SITE_NAME, SITE_URL } from '@/Components/SeoHead';
 
 export default function Welcome(props) {
-    const { data, setData, post, processing, errors, recentlySuccessful, reset } = useForm({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
-        terms_agreed: false
-    });
+    const homeDescription = 'Island Residential offers professionally managed apartments for rent in Sydney, Nova Scotia and across Cape Breton, including 1 and 2 bedroom rentals.';
+    const structuredData = [
+        {
+            '@context': 'https://schema.org',
+            '@type': ['LocalBusiness', 'RealEstateAgent'],
+            '@id': `${SITE_URL}/#business`,
+            name: SITE_NAME,
+            url: SITE_URL,
+            logo: `${SITE_URL}/images/media__1779672706531.png`,
+            image: DEFAULT_IMAGE,
+            email: 'rent@islandresidential.ca',
+            areaServed: [
+                'Sydney, Nova Scotia',
+                'Cape Breton, Nova Scotia',
+                'New Waterford, Nova Scotia',
+                'Sydney Mines, Nova Scotia',
+                'North Sydney, Nova Scotia',
+                'Glace Bay, Nova Scotia',
+            ],
+            address: {
+                '@type': 'PostalAddress',
+                addressLocality: 'Sydney',
+                addressRegion: 'NS',
+                addressCountry: 'CA',
+            },
+            description: homeDescription,
+            makesOffer: [
+                {
+                    '@type': 'Offer',
+                    itemOffered: {
+                        '@type': 'Apartment',
+                        name: 'Apartments for rent in Sydney, NS and Cape Breton',
+                    },
+                },
+                {
+                    '@type': 'Offer',
+                    itemOffered: {
+                        '@type': 'Service',
+                        name: 'Professional property management',
+                    },
+                },
+            ],
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            '@id': `${SITE_URL}/#website`,
+            name: SITE_NAME,
+            url: SITE_URL,
+            publisher: {
+                '@id': `${SITE_URL}/#business`,
+            },
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+                {
+                    '@type': 'Question',
+                    name: 'Where does Island Residential offer apartments for rent?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Island Residential offers professionally managed apartments in Sydney, NS and across Cape Breton, including New Waterford, Sydney Mines, North Sydney and Glace Bay.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'How can I apply for an Island Residential apartment?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Prospective tenants can browse available apartments and submit a rental application through the Island Residential website.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'How can tenants request maintenance?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Current tenants can submit maintenance requests online through the Island Residential maintenance request form.',
+                    },
+                },
+            ],
+        },
+    ];
 
-    const submitContact = (e) => {
-        e.preventDefault();
-        post(route('contact.store'), {
-            onSuccess: () => reset(),
-        });
-    };
     const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -93,7 +165,12 @@ export default function Welcome(props) {
 
     return (
         <div className="min-h-screen bg-brand-white text-brand-black selection:bg-brand-black selection:text-brand-white font-sans overflow-hidden">
-            <Head title="Welcome to Island Residential" />
+            <SeoHead
+                title="Apartments for Rent in Sydney, NS & Cape Breton"
+                description={homeDescription}
+                path="/"
+                structuredData={structuredData}
+            />
 
             {/* Navbar */}
             <nav className={`fixed w-full z-[60] transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>
@@ -290,76 +367,43 @@ export default function Welcome(props) {
 
                     <div className={`bg-white/80 backdrop-blur-2xl p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-white relative overflow-hidden opacity-0 ${isContactVisible ? 'animate-fade-in-up' : ''}`} style={isContactVisible ? { animationDelay: '0.3s', animationFillMode: 'forwards' } : {}}>
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-black to-transparent opacity-10"></div>
-                        <h3 className="text-3xl font-bold tracking-tight mb-8 text-brand-black">Send us a message</h3>
+                        <h3 className="text-3xl font-bold tracking-tight mb-4 text-brand-black">How can we help?</h3>
+                        <p className="text-brand-gray font-light leading-relaxed mb-10">
+                            Use the dedicated form that best matches your request so our team receives the right details.
+                        </p>
 
-                        {recentlySuccessful ? (
-                            <div className="bg-green-50 border border-green-200 text-green-800 p-8 rounded-3xl animate-scale-up backdrop-blur-md">
-                                <h4 className="font-bold text-xl mb-2 flex items-center"><span className="mr-2">✨</span> Message Sent!</h4>
-                                <p className="font-light opacity-90">Thank you for contacting us. We will get back to you shortly.</p>
-                            </div>
-                        ) : (
-                            <form onSubmit={submitContact} className="space-y-6">
-                                <div>
-                                    <label className="block text-xs font-bold mb-2 uppercase tracking-wider pl-4 text-brand-gray">Name *</label>
-                                    <input
-                                        type="text"
-                                        className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-all bg-white hover:bg-gray-50 text-brand-black"
-                                        required
-                                        value={data.name}
-                                        onChange={e => setData('name', e.target.value)}
-                                    />
-                                    {errors.name && <p className="text-red-500 text-xs mt-2 pl-4">{errors.name}</p>}
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                            <Link href={route('forms.rental')} className="group block rounded-3xl border border-gray-100 bg-white p-6 shadow-sm hover:border-brand-black/10 hover:shadow-xl transition-all">
+                                <div className="flex items-center justify-between gap-6">
                                     <div>
-                                        <label className="block text-xs font-bold mb-2 uppercase tracking-wider pl-4 text-brand-gray">Email *</label>
-                                        <input
-                                            type="email"
-                                            className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-all bg-white hover:bg-gray-50 text-brand-black"
-                                            required
-                                            value={data.email}
-                                            onChange={e => setData('email', e.target.value)}
-                                        />
-                                        {errors.email && <p className="text-red-500 text-xs mt-2 pl-4">{errors.email}</p>}
+                                        <h4 className="font-bold text-xl text-brand-black mb-2">Apply for an apartment</h4>
+                                        <p className="text-sm font-light text-brand-gray leading-relaxed">Submit a rental application for available apartments.</p>
                                     </div>
-                                    <div>
-                                        <label className="block text-xs font-bold mb-2 uppercase tracking-wider pl-4 text-brand-gray">Phone (Optional)</label>
-                                        <input
-                                            type="tel"
-                                            className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-all bg-white hover:bg-gray-50 text-brand-black"
-                                            value={data.phone}
-                                            onChange={e => setData('phone', e.target.value)}
-                                        />
-                                    </div>
+                                    <span className="shrink-0 w-12 h-12 rounded-full bg-brand-black text-brand-white flex items-center justify-center group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-bold mb-2 uppercase tracking-wider pl-4 text-brand-gray">Message *</label>
-                                    <textarea
-                                        className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl transition-all bg-white hover:bg-gray-50 text-brand-black"
-                                        rows="4"
-                                        required
-                                        value={data.message}
-                                        onChange={e => setData('message', e.target.value)}
-                                    ></textarea>
-                                    {errors.message && <p className="text-red-500 text-xs mt-2 pl-4">{errors.message}</p>}
-                                </div>
+                            </Link>
 
-                                <label className="flex items-start gap-4 cursor-pointer mt-4 p-4 rounded-2xl bg-white border border-gray-100 hover:bg-gray-50 transition-colors">
-                                    <input type="checkbox" className="mt-1 border-gray-300 bg-transparent text-brand-black focus:ring-brand-black rounded" checked={data.terms_agreed} onChange={e => setData('terms_agreed', e.target.checked)} required />
+                            <Link href={route('forms.maintenance')} className="group block rounded-3xl border border-gray-100 bg-white p-6 shadow-sm hover:border-brand-black/10 hover:shadow-xl transition-all">
+                                <div className="flex items-center justify-between gap-6">
                                     <div>
-                                        <div className="font-bold mb-1 tracking-wider uppercase text-xs text-brand-black">Data & Privacy Policy *</div>
-                                        <div className="text-xs font-light text-brand-gray leading-relaxed">
-                                            I have read and accept the <a href={route('privacy.policy')} target="_blank" className="text-brand-black underline font-bold hover:text-brand-gray transition-colors">Privacy and Data Handling Policy</a>.
-                                        </div>
+                                        <h4 className="font-bold text-xl text-brand-black mb-2">Request maintenance</h4>
+                                        <p className="text-sm font-light text-brand-gray leading-relaxed">Send a maintenance request for your current rental.</p>
                                     </div>
-                                </label>
+                                    <span className="shrink-0 w-12 h-12 rounded-full bg-brand-black text-brand-white flex items-center justify-center group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
+                                </div>
+                            </Link>
 
-                                <button type="submit" disabled={processing || !data.terms_agreed} className="w-full group relative px-8 py-5 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50 mt-6 hover:shadow-[0_0_30px_rgba(0,0,0,0.2)] transition-all">
-                                    <span className="relative z-10">{processing ? 'Sending...' : 'Send Message'}</span>
-                                    <div className="absolute inset-0 bg-gray-800 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0 rounded-full"></div>
-                                </button>
-                            </form>
-                        )}
+                            <Link href={route('properties.index')} className="group block rounded-3xl border border-gray-100 bg-white p-6 shadow-sm hover:border-brand-black/10 hover:shadow-xl transition-all">
+                                <div className="flex items-center justify-between gap-6">
+                                    <div>
+                                        <h4 className="font-bold text-xl text-brand-black mb-2">View available apartments</h4>
+                                        <p className="text-sm font-light text-brand-gray leading-relaxed">Browse current listings before choosing the right next step.</p>
+                                    </div>
+                                    <span className="shrink-0 w-12 h-12 rounded-full bg-brand-black text-brand-white flex items-center justify-center group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
+                                </div>
+                            </Link>
+                        </div>
+
                     </div>
                 </div>
             </section>

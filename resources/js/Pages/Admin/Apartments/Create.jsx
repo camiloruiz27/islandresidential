@@ -43,7 +43,9 @@ export default function Create() {
 
     return (
         <AdminLayout title="New Apartment">
-            <Head title="New Apartment - Admin" />
+            <Head title="New Apartment | Admin">
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             <div className="flex items-center gap-4 mb-8">
                 <Link href={route('admin.apartments.index')} className="text-gray-400 hover:text-black transition-colors text-sm font-bold">
