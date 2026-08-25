@@ -32,7 +32,9 @@ export default function ResetPassword({ token, email }) {
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title="Reset Password">
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             <form onSubmit={submit}>
                 <div>

@@ -195,7 +195,9 @@ function SettingsWidget({ settings }) {
 export default function Dashboard({ stats, recentApplications, recentMaintenance, settings, flash }) {
     return (
         <AdminLayout title="Dashboard">
-            <Head title="Admin Dashboard - Island Residential" />
+            <Head title="Admin Dashboard | Island Residential">
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             {/* Flash message */}
             {flash?.success && (

@@ -81,7 +81,9 @@ export default function ApplicationsIndex({ applications, flash }) {
 
     return (
         <AdminLayout title="Rental Applications">
-            <Head title="Applications - Admin" />
+            <Head title="Applications | Admin">
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             {/* File Modal */}
             {fileModal && <FileModal files={fileModal} onClose={() => setFileModal(null)} />}

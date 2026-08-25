@@ -1,9 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 /*
@@ -21,8 +20,6 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
     ]);
 });
 
@@ -33,16 +30,38 @@ Route::get('/apartment-images/{path}', function (string $path) {
     return Storage::disk('public')->response($path);
 })->where('path', '.*')->name('public.apartment-image');
 
-Route::get('/setup-admin', function () {
-    $user = \App\Models\User::updateOrCreate(
-        ['email' => 'admin@islandresidential.ca'],
+Route::get('/sitemap.xml', function () {
+    $baseUrl = rtrim(config('app.url'), '/');
+    $urls = collect([
         [
-            'name' => 'Admin Island Residential',
-            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
-        ]
-    );
-    return 'Usuario administrador creado o restaurado con éxito. Correo: admin@islandresidential.ca | Clave: password123';
-});
+            'loc' => $baseUrl.'/',
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'weekly',
+            'priority' => '1.0',
+        ],
+        [
+            'loc' => $baseUrl.'/properties',
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'daily',
+            'priority' => '0.9',
+        ],
+    ]);
+
+    $propertyUrls = \App\Models\Apartment::query()
+        ->where('status', 'available')
+        ->latest('updated_at')
+        ->get(['id', 'updated_at'])
+        ->map(fn ($apartment) => [
+            'loc' => $baseUrl.'/properties/'.$apartment->id,
+            'lastmod' => optional($apartment->updated_at)->toAtomString() ?? now()->toAtomString(),
+            'changefreq' => 'weekly',
+            'priority' => '0.8',
+        ]);
+
+    $xml = view('sitemap', ['urls' => $urls->merge($propertyUrls)])->render();
+
+    return response($xml, 200)->header('Content-Type', 'application/xml');
+})->name('sitemap');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -65,6 +84,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Maintenance Requests
     Route::get('/maintenance', [\App\Http\Controllers\Admin\MaintenanceController::class, 'index'])->name('maintenance.index');
     Route::patch('/maintenance/{maintenanceRequest}/status', [\App\Http\Controllers\Admin\MaintenanceController::class, 'updateStatus'])->name('maintenance.status');
+
     // Settings
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
@@ -78,6 +98,7 @@ Route::get('/properties', function () {
 
 Route::get('/properties/{apartment}', function (\App\Models\Apartment $apartment) {
     abort_if($apartment->status === 'hidden', 404);
+
     return Inertia::render('Properties/Show', [
         'apartment' => $apartment->resolveImages()
     ]);

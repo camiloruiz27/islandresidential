@@ -1,8 +1,51 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import SeoHead, { SITE_NAME, SITE_URL } from '@/Components/SeoHead';
 
 export default function Index({ apartments }) {
     const [scrolled, setScrolled] = useState(false);
+    const description = 'Browse available apartments for rent in Sydney, Nova Scotia and across Cape Breton from Island Residential.';
+    const structuredData = [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'Available Apartments for Rent',
+            description,
+            url: `${SITE_URL}/properties`,
+            isPartOf: {
+                '@type': 'WebSite',
+                name: SITE_NAME,
+                url: SITE_URL,
+            },
+            mainEntity: {
+                '@type': 'ItemList',
+                itemListElement: apartments.map((apt, index) => ({
+                    '@type': 'ListItem',
+                    position: index + 1,
+                    url: `${SITE_URL}/properties/${apt.id}`,
+                    name: apt.title,
+                })),
+            },
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'Home',
+                    item: SITE_URL,
+                },
+                {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: 'Available Apartments',
+                    item: `${SITE_URL}/properties`,
+                },
+            ],
+        },
+    ];
 
     useEffect(() => {
         const handleScroll = () => {
@@ -14,7 +57,12 @@ export default function Index({ apartments }) {
 
     return (
         <div className="min-h-screen bg-brand-white text-brand-black font-sans overflow-hidden selection:bg-brand-black selection:text-brand-white">
-            <Head title="Available Properties - Island Residential" />
+            <SeoHead
+                title="Available Apartments for Rent in Sydney, NS"
+                description={description}
+                path="/properties"
+                structuredData={structuredData}
+            />
 
             {/* Navbar */}
             <nav className={`fixed w-full z-50 transition-all duration-700 ${scrolled ? 'bg-brand-white/95 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-8'}`}>

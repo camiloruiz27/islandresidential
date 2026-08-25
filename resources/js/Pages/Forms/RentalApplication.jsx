@@ -1,6 +1,7 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
+import SeoHead from '@/Components/SeoHead';
 
 export default function RentalApplication() {
     const { recaptcha, isProduction } = usePage().props;
@@ -286,7 +287,12 @@ export default function RentalApplication() {
 
     return (
         <div className="min-h-screen bg-brand-white text-brand-black font-sans">
-            <Head title="Rental Application - Island Residential" />
+            <SeoHead
+                title="Rental Application | Island Residential"
+                description="Apply online for an Island Residential apartment in Sydney, NS or Cape Breton."
+                path="/forms/rental"
+                robots="noindex, follow"
+            />
 
             <nav className="border-b border-gray-200 py-8 bg-brand-white">
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center">

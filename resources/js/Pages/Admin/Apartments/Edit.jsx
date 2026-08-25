@@ -146,7 +146,9 @@ export default function Edit({ apartment }) {
 
     return (
         <AdminLayout title="Edit Apartment">
-            <Head title="Edit Apartment - Admin" />
+            <Head title="Edit Apartment | Admin">
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             <div className="flex items-center gap-4 mb-8">
                 <Link href={route('admin.apartments.index')} className="text-gray-400 hover:text-black transition-colors text-sm font-bold">
