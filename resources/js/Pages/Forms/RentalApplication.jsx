@@ -78,6 +78,7 @@ export default function RentalApplication() {
         'application_data.pets_count': 'How many pets?',
         'application_data.viewed_property': 'Have you already viewed this property?',
         'application_data.viewing_availability': 'Days and times that work for viewing',
+        'application_data.move_in_date': 'Desired Move-in Date',
         'application_data.rented_before': 'Rented before?',
         'application_data.current_rental_address': 'Current rental address',
         'application_data.manager_name': 'Manager Name',
@@ -240,7 +241,7 @@ export default function RentalApplication() {
 
     const isTab1Valid = () => {
         const ad = data.application_data;
-        if (!ad.property_title || !data.applicant_email || !data.applicant_phone || !ad.first_name || !ad.last_name || !ad.current_address || !ad.city || !ad.state || !ad.date_of_birth || !ad.occupants_count || !ad.pets || !ad.viewed_property) return false;
+        if (!ad.property_title || !data.applicant_email || !data.applicant_phone || !ad.first_name || !ad.last_name || !ad.current_address || !ad.city || !ad.state || !ad.date_of_birth || !ad.occupants_count || !ad.pets || !ad.viewed_property || !ad.move_in_date) return false;
         if (ad.pets === 'Yes' && !ad.pets_count) return false;
         if (ad.viewed_property === 'No' && !ad.viewing_availability) return false;
         return true;
@@ -450,6 +451,10 @@ export default function RentalApplication() {
                                             <textarea className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl bg-white hover:bg-gray-50 transition-colors" rows="3" value={data.application_data.viewing_availability} onChange={e => handleDataChange('viewing_availability', e.target.value)} required></textarea>
                                         </div>
                                     )}
+                                    <div>
+                                        <label className="block text-sm font-bold mb-3 uppercase tracking-wider pl-4">Desired Move-in Date *</label>
+                                        <input type="date" className="w-full border-gray-200 focus:border-brand-black focus:ring-0 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors" value={data.application_data.move_in_date} onChange={e => handleDataChange('move_in_date', e.target.value)} required />
+                                    </div>
                                     <div className="flex justify-end pt-8 border-t border-gray-100">
                                         <button type="button" onClick={handleNextToTab2} className="group relative px-10 py-4 bg-brand-black text-brand-white text-xs font-bold uppercase tracking-[0.2em] overflow-hidden rounded-full shadow-lg disabled:opacity-50">
                                             <span className="relative z-10">Next Step →</span>

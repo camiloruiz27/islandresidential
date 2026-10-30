@@ -195,8 +195,32 @@
                                                     @endif
                                                 @elseif(is_bool($subValue))
                                                     {{ $subValue ? 'Yes' : 'No' }}
+                                                @elseif($subKey === 'co_applicants' && is_array($subValue))
+                                                    @foreach($subValue as $coApplicantIndex => $coApplicant)
+                                                        @if(is_array($coApplicant))
+                                                            <table class="nested-table">
+                                                                <tr>
+                                                                    <th colspan="2">Co-Applicant #{{ $coApplicantIndex + 1 }}</th>
+                                                                </tr>
+                                                                @foreach($coApplicant as $coApplicantKey => $coApplicantValue)
+                                                                    @if(!str_contains((string) $coApplicantKey, 'path') && filled($coApplicantValue))
+                                                                        <tr>
+                                                                            <th>{{ ucwords(str_replace('_', ' ', $coApplicantKey)) }}</th>
+                                                                            <td>
+                                                                                @if(is_bool($coApplicantValue))
+                                                                                    {{ $coApplicantValue ? 'Yes' : 'No' }}
+                                                                                @else
+                                                                                    {!! nl2br(e($coApplicantValue)) !!}
+                                                                                @endif
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforeach
+                                                            </table>
+                                                        @endif
+                                                    @endforeach
                                                 @elseif(is_array($subValue))
-                                                    JSON Data
+                                                    {{ implode(', ', array_filter($subValue, fn ($item) => is_scalar($item) && filled($item))) ?: '-' }}
                                                 @else
                                                     {{ $subValue ?: '-' }}
                                                 @endif

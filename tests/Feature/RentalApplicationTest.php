@@ -48,6 +48,7 @@ class RentalApplicationTest extends TestCase
         $this->assertNotNull($application);
         $this->assertEquals($apartment->id, $application->apartment_id);
         $this->assertTrue((bool) $application->application_data['terms_agreed']);
+        $this->assertSame('2026-07-01', $application->application_data['move_in_date']);
         $this->assertCount(3, $application->files);
 
         Mail::assertSent(FormSubmittedNotification::class);
@@ -124,6 +125,72 @@ class RentalApplicationTest extends TestCase
             'application_data.viewing_availability',
             'application_data.current_income_source',
         ]);
+    }
+
+    public function test_rental_application_requires_a_desired_move_in_date(): void
+    {
+        Mail::fake();
+
+        $apartment = Apartment::create([
+            'title' => 'Unit 103',
+            'description' => 'Nice apartment',
+            'location' => 'Sydney',
+            'price' => 1200,
+            'bedrooms' => 2,
+            'bathrooms' => 1,
+            'images' => [],
+            'status' => 'available',
+            'has_parking' => false,
+        ]);
+
+        $payload = $this->validPayload($apartment, [
+            'application_data' => ['move_in_date' => ''],
+        ]);
+
+        $this->post(route('forms.rental.store'), $payload)
+            ->assertSessionHasErrors(['application_data.move_in_date']);
+    }
+
+    public function test_rental_application_email_renders_co_applicant_details(): void
+    {
+        Mail::fake();
+        Http::fake();
+
+        Setting::updateOrCreate(
+            ['key' => 'rental_email'],
+            ['value' => 'rentals@example.com', 'label' => 'Rental Email']
+        );
+
+        $apartment = Apartment::create([
+            'title' => 'Unit 104',
+            'description' => 'Nice apartment',
+            'location' => 'Sydney',
+            'price' => 1200,
+            'bedrooms' => 2,
+            'bathrooms' => 1,
+            'images' => [],
+            'status' => 'available',
+            'has_parking' => false,
+        ]);
+
+        $this->post(route('forms.rental.store'), $this->validPayload($apartment))
+            ->assertSessionHasNoErrors();
+
+        $application = RentalApplication::firstOrFail();
+        $this->assertSame('John', $application->application_data['co_applicants'][0]['name']);
+        $this->assertSame('Savings', $application->application_data['co_applicants'][0]['current_income_source']);
+
+        Mail::assertSent(FormSubmittedNotification::class, function (FormSubmittedNotification $mail) {
+            $rendered = view('emails.form-submitted', [
+                'formData' => $mail->formData,
+                'formType' => $mail->formType,
+            ])->render();
+
+            return str_contains($rendered, 'Co-Applicant #1')
+                && str_contains($rendered, 'John')
+                && str_contains($rendered, 'Savings')
+                && !str_contains($rendered, 'JSON Data');
+        });
     }
 
     public function test_rental_application_can_be_submitted_with_rental_and_employment_history(): void
@@ -324,7 +391,7 @@ class RentalApplicationTest extends TestCase
                 'pets_count' => 1,
                 'viewed_property' => 'No',
                 'viewing_availability' => 'Monday 10am, Tuesday 3pm, Friday 1pm',
-                'move_in_date' => '',
+                'move_in_date' => '2026-07-01',
                 'rented_before' => 'No',
                 'current_rental_address' => '',
                 'manager_name' => '',
