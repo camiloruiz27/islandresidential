@@ -39,6 +39,7 @@ class RentalApplicationController extends Controller
             'application_data.pets_count' => 'nullable|integer|min:1',
             'application_data.viewed_property' => ['required', Rule::in(['Yes', 'No'])],
             'application_data.viewing_availability' => 'nullable|string',
+            'application_data.move_in_date' => 'required|date',
             'application_data.rented_before' => ['required', Rule::in(['Yes', 'No'])],
             'application_data.current_rental_address' => 'nullable|string|max:255',
             'application_data.manager_name' => 'nullable|string|max:255',

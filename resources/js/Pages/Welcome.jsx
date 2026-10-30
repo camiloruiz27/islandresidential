@@ -255,6 +255,13 @@ export default function Welcome(props) {
                             <span className="relative z-10 group-hover:text-brand-black transition-colors duration-500">Apply Now</span>
                             <div className="absolute inset-0 bg-brand-white transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0 rounded-full"></div>
                         </Link>
+                        <Link
+                            href={route('forms.maintenance')}
+                            className="group relative px-10 py-5 bg-brand-black/90 backdrop-blur-sm text-brand-white font-bold uppercase tracking-[0.2em] text-xs overflow-hidden rounded-full shadow-lg border border-brand-black/90"
+                        >
+                            <span className="relative z-10 group-hover:text-brand-black transition-colors duration-500">Maintenance Request</span>
+                            <div className="absolute inset-0 bg-brand-white transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0 rounded-full"></div>
+                        </Link>
                     </div>
                 </div>
 
